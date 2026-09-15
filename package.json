@@ -2,6 +2,7 @@
   "name": "dev-words",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,12 +10,21 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@better-auth/mongo-adapter": "^1.7.3",
+    "better-auth": "^1.7.5",
+    "mongodb": "^7.6.0",
     "next": "16.3.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-spinners": "^0.17.1",
+    "simpledotcss": "^2.3.7"
   },
   "devDependencies": {
     "eslint": "^9",
     "eslint-config-next": "16.3.3"
+  },
+  // ** 특정 환경이나 프로그램에서 "스크립트(Script) 실행을 허용할지 여부"를 결정하는 설정 항목(옵션) */
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
   }
 }
