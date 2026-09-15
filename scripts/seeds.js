@@ -1,3 +1,4 @@
+// 환경 변수 파일, Better Auth, MongoDB를 사용하기 위해 필요한 모듈을 불러옵니다.
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { betterAuth } from "better-auth";
@@ -5,6 +6,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { admin as adminPlugin } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
 
+// 단어를 분류할 때 사용할 여섯 개의 카테고리를 정의합니다.
 const categories = [
   "웹 기초",
   "React",
@@ -14,6 +16,7 @@ const categories = [
   "기타",
 ];
 
+// 카테고리마다 5개씩 저장할 총 30개의 초기 단어를 정의합니다.
 const seedWords = [
   {
     name: "HTTP",
@@ -257,6 +260,7 @@ const seedWords = [
   },
 ];
 
+// Better Auth로 생성할 관리자 1명과 일반 사용자 2명의 정보를 정의합니다.
 const seedUsers = [
   {
     name: "관리자 학습자",
@@ -278,6 +282,7 @@ const seedUsers = [
   },
 ];
 
+// 세 사용자가 서로 다른 카테고리의 단어에 남길 초기 개인 메모를 정의합니다.
 const seedMemos = [
   {
     userEmail: "learner1@example.com",
@@ -299,6 +304,7 @@ const seedMemos = [
   },
 ];
 
+// 프로젝트 루트의 .env.local 또는 .env 파일에서 환경 변수를 불러옵니다.
 function loadLocalEnvironmentVariables() {
   const environmentFilePaths = [
     resolve(process.cwd(), ".env.local"),
@@ -312,7 +318,9 @@ function loadLocalEnvironmentVariables() {
   }
 }
 
+// DB에 연결하기 전에 초기 데이터의 개수, 형식, 중복 여부를 검사합니다.
 function validateSeedData() {
+  // 전체 단어 수와 카테고리별 단어 수가 약속한 구성과 같은지 확인합니다.
   if (seedWords.length !== 30) {
     throw new Error("초기 단어는 정확히 30개여야 합니다.");
   }
@@ -329,6 +337,7 @@ function validateSeedData() {
     }
   }
 
+  // 각 단어의 필수값, 카테고리, slug, tags가 올바른지 확인합니다.
   const slugs = new Set();
 
   for (const word of seedWords) {
@@ -360,6 +369,7 @@ function validateSeedData() {
     slugs.add(word.slug);
   }
 
+  // 초기 사용자 수와 각 사용자의 이메일, 비밀번호, 역할을 확인합니다.
   if (seedUsers.length !== 3) {
     throw new Error("초기 사용자는 정확히 3명이어야 합니다.");
   }
@@ -386,12 +396,14 @@ function validateSeedData() {
     emails.add(user.email);
   }
 
+  // 초기 사용자 중 관리자 역할을 가진 사용자가 정확히 한 명인지 확인합니다.
   const adminCount = seedUsers.filter((user) => user.role === "admin").length;
 
   if (adminCount !== 1) {
     throw new Error("초기 사용자 중 관리자는 정확히 1명이어야 합니다.");
   }
 
+  // 초기 메모가 정확히 세 개이고 모두 작성할 내용을 가지고 있는지 확인합니다.
   if (seedMemos.length !== 3) {
     throw new Error("초기 개인 메모는 정확히 3개여야 합니다.");
   }
@@ -417,12 +429,15 @@ function validateSeedData() {
     memoCategories.add(memoWord.category);
   }
 
+  // 세 메모가 서로 다른 카테고리의 단어에 연결되는지 확인합니다.
   if (memoCategories.size !== seedMemos.length) {
     throw new Error("초기 개인 메모는 서로 다른 카테고리의 단어에 작성해야 합니다.");
   }
 }
 
+// 중복 데이터 생성을 DB 단계에서도 막을 수 있도록 고유 인덱스를 만듭니다.
 async function createIndexes(database) {
+  // 같은 slug를 사용하는 단어가 두 개 이상 저장되지 않게 합니다.
   await database.collection("words").createIndex(
     { slug: 1 },
     {
@@ -431,6 +446,7 @@ async function createIndexes(database) {
     }
   );
 
+  // 한 사용자가 같은 단어에 개인 메모를 하나만 작성할 수 있게 합니다.
   await database.collection("memos").createIndex(
     { userId: 1, wordId: 1 },
     {
@@ -439,6 +455,7 @@ async function createIndexes(database) {
     }
   );
 
+  // 한 사용자의 동일한 새 단어 요청은 pending 상태에서 하나만 허용합니다.
   await database.collection("wordRequests").createIndex(
     { userId: 1, normalizedWord: 1 },
     {
@@ -450,6 +467,7 @@ async function createIndexes(database) {
     }
   );
 
+  // 한 사용자의 동일한 단어 수정 요청은 pending 상태에서 하나만 허용합니다.
   await database.collection("wordEditRequests").createIndex(
     { userId: 1, wordId: 1 },
     {
@@ -462,10 +480,12 @@ async function createIndexes(database) {
   );
 }
 
+// 이메일로 기존 사용자를 확인하고, 없는 사용자만 Better Auth로 생성합니다.
 async function seedTestUsers(auth, database) {
   const userCollection = database.collection("user");
   const userIdsByEmail = new Map();
 
+  // 메모를 연결할 때 사용할 수 있도록 이메일별 사용자 ID를 모읍니다.
   for (const seedUser of seedUsers) {
     const email = seedUser.email.toLowerCase();
     const existingUser = await userCollection.findOne({ email });
@@ -482,6 +502,7 @@ async function seedTestUsers(auth, database) {
       continue;
     }
 
+    // 사용자를 Better Auth API로 생성해 비밀번호가 평문으로 저장되지 않게 합니다.
     const created = await auth.api.createUser({
       body: {
         name: seedUser.name,
@@ -504,10 +525,12 @@ async function seedTestUsers(auth, database) {
   return userIdsByEmail;
 }
 
+// slug로 기존 단어를 확인하고, 없는 단어만 words 컬렉션에 저장합니다.
 async function seedDictionaryWords(database) {
   const wordCollection = database.collection("words");
   const wordIdsBySlug = new Map();
 
+  // 메모를 연결할 때 사용할 수 있도록 slug별 단어 ID를 모읍니다.
   for (const seedWord of seedWords) {
     const existingWord = await wordCollection.findOne({
       slug: seedWord.slug,
@@ -533,6 +556,7 @@ async function seedDictionaryWords(database) {
   return wordIdsBySlug;
 }
 
+// 사용자 ID와 단어 ID를 연결해 아직 존재하지 않는 개인 메모만 저장합니다.
 async function seedPersonalMemos(database, userIdsByEmail, wordIdsBySlug) {
   const memoCollection = database.collection("memos");
 
@@ -574,6 +598,7 @@ async function seedPersonalMemos(database, userIdsByEmail, wordIdsBySlug) {
   }
 }
 
+// --dry-run 실행 시 DB를 변경하지 않고 초기 데이터 검사 결과만 출력합니다.
 function printDryRunResult() {
   console.log("Seed 데이터 검증을 통과했습니다.");
   console.log(`카테고리: ${categories.length}개`);
@@ -591,10 +616,13 @@ function printDryRunResult() {
   console.log("--dry-run에서는 MongoDB 데이터를 변경하지 않았습니다.");
 }
 
+// 환경 변수 확인부터 DB 연결과 데이터 저장까지 전체 Seed 순서를 실행합니다.
 async function runSeed() {
+  // 먼저 환경 변수를 불러오고 코드에 작성한 초기 데이터가 올바른지 검사합니다.
   loadLocalEnvironmentVariables();
   validateSeedData();
 
+  // --dry-run 옵션이 있으면 검사 결과만 출력하고 DB 연결 전에 종료합니다.
   const isDryRun = process.argv.includes("--dry-run");
 
   if (isDryRun) {
@@ -602,6 +630,7 @@ async function runSeed() {
     return;
   }
 
+  // MongoDB와 Better Auth 설정에 사용할 환경 변수와 기본값을 준비합니다.
   const mongoUri = process.env.MONGODB_URI;
   const mongoDatabaseName = process.env.MONGODB_DB_NAME || "dev-words";
   const betterAuthSecret = process.env.BETTER_AUTH_SECRET;
@@ -614,11 +643,13 @@ async function runSeed() {
     throw new Error("BETTER_AUTH_SECRET은 32자 이상이어야 합니다.");
   }
 
+  // 환경 변수의 주소를 사용해 MongoDB 클라이언트를 준비합니다.
   const client = new MongoClient(mongoUri);
 
   try {
     await client.connect();
 
+    // Seed 사용자도 서비스와 같은 인증 규칙을 사용하도록 Better Auth를 설정합니다.
     const database = client.db(mongoDatabaseName);
     const auth = betterAuth({
       secret: betterAuthSecret,
@@ -641,8 +672,10 @@ async function runSeed() {
 
     console.log(`MongoDB 연결 완료: ${mongoDatabaseName}`);
 
+    // 데이터를 넣기 전에 중복 방지 인덱스를 먼저 준비합니다.
     await createIndexes(database);
 
+    // 사용자, 단어, 메모 순서로 저장해 메모에 필요한 두 ID를 연결합니다.
     const userIdsByEmail = await seedTestUsers(auth, database);
     const wordIdsBySlug = await seedDictionaryWords(database);
 
@@ -650,10 +683,12 @@ async function runSeed() {
 
     console.log("초기 데이터 저장을 완료했습니다.");
   } finally {
+    // 실행 성공 여부와 관계없이 MongoDB 연결을 닫아 프로세스가 남지 않게 합니다.
     await client.close();
   }
 }
 
+// Seed 실행 중 오류가 생기면 원인을 출력하고 실패 종료 코드를 설정합니다.
 try {
   await runSeed();
 } catch (error) {
