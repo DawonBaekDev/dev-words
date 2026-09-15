@@ -1,0 +1,662 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
+import { betterAuth } from "better-auth";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { admin as adminPlugin } from "better-auth/plugins";
+import { MongoClient } from "mongodb";
+
+const categories = [
+  "웹 기초",
+  "React",
+  "데이터",
+  "Next.js",
+  "JavaScript",
+  "기타",
+];
+
+const seedWords = [
+  {
+    name: "HTTP",
+    slug: "http",
+    description:
+      "웹에서 브라우저와 서버가 요청과 응답을 주고받을 때 사용하는 통신 규칙입니다.",
+    category: "웹 기초",
+    tags: ["통신", "요청과 응답"],
+  },
+  {
+    name: "URL",
+    slug: "url",
+    description:
+      "웹페이지나 이미지처럼 인터넷에 있는 자원의 위치를 나타내는 주소입니다.",
+    category: "웹 기초",
+    tags: ["주소"],
+  },
+  {
+    name: "브라우저",
+    slug: "browser",
+    description:
+      "웹페이지를 불러와 화면에 표시하고 사용자가 페이지와 상호작용할 수 있게 하는 프로그램입니다.",
+    category: "웹 기초",
+    tags: ["클라이언트"],
+  },
+  {
+    name: "클라이언트",
+    slug: "client",
+    description:
+      "서버에 데이터나 작업을 요청하고 서버가 보내 준 결과를 사용하는 프로그램입니다. 웹 브라우저가 대표적인 예입니다.",
+    category: "웹 기초",
+    tags: ["요청"],
+  },
+  {
+    name: "서버",
+    slug: "server",
+    description:
+      "클라이언트의 요청을 받아 필요한 작업을 처리하고 결과를 보내 주는 프로그램이나 컴퓨터입니다.",
+    category: "웹 기초",
+    tags: ["응답"],
+  },
+  {
+    name: "컴포넌트",
+    slug: "component",
+    description:
+      "버튼이나 검색창처럼 화면의 일부를 구성하는 코드 단위입니다. 같은 컴포넌트를 여러 곳에서 재사용할 수 있습니다.",
+    category: "React",
+    tags: ["UI", "재사용"],
+  },
+  {
+    name: "Props",
+    slug: "props",
+    description:
+      "부모 컴포넌트가 자식 컴포넌트에 전달하는 데이터입니다. 전달받은 컴포넌트는 Props를 직접 수정하지 않고 사용합니다.",
+    category: "React",
+    tags: ["데이터 전달"],
+  },
+  {
+    name: "State",
+    slug: "state",
+    description:
+      "컴포넌트가 기억하는 데이터입니다. 입력창의 내용이나 버튼을 누른 횟수처럼 바뀌는 값을 관리할 때 사용합니다.",
+    category: "React",
+    tags: ["상태 관리"],
+  },
+  {
+    name: "useState",
+    slug: "use-state",
+    description:
+      "함수형 컴포넌트에서 State를 만들고 그 값을 변경할 수 있게 해 주는 Hook입니다.",
+    category: "React",
+    tags: ["Hook", "상태 관리"],
+  },
+  {
+    name: "JSX",
+    slug: "jsx",
+    description:
+      "JavaScript 코드 안에서 HTML과 비슷한 문법으로 화면 구조를 표현하는 문법입니다.",
+    category: "React",
+    tags: ["화면 작성"],
+  },
+  {
+    name: "데이터베이스",
+    slug: "database",
+    description:
+      "여러 데이터를 저장하고 필요한 데이터를 찾거나 변경할 수 있도록 관리하는 시스템입니다.",
+    category: "데이터",
+    tags: ["저장"],
+  },
+  {
+    name: "MongoDB",
+    slug: "mongodb",
+    description:
+      "데이터를 문서 형태로 저장하는 데이터베이스입니다. 단어의 이름, 설명, 태그 등을 하나의 문서로 묶어 저장할 수 있습니다.",
+    category: "데이터",
+    tags: ["NoSQL", "문서"],
+  },
+  {
+    name: "컬렉션",
+    slug: "collection",
+    description:
+      "MongoDB에서 관련된 문서들을 모아 두는 공간입니다. 예를 들어 여러 단어 문서를 하나의 컬렉션에 저장할 수 있습니다.",
+    category: "데이터",
+    tags: ["MongoDB"],
+  },
+  {
+    name: "문서",
+    slug: "document",
+    description:
+      "MongoDB에 저장되는 데이터 한 건입니다. 여러 필드와 값으로 구성되며 단어 하나의 정보를 담을 수 있습니다.",
+    category: "데이터",
+    tags: ["MongoDB", "필드"],
+  },
+  {
+    name: "쿼리",
+    slug: "query",
+    description:
+      "데이터베이스에 원하는 데이터를 찾거나 처리하도록 요청하는 명령입니다. 특정 카테고리의 단어를 찾는 요청이 한 예입니다.",
+    category: "데이터",
+    tags: ["조회"],
+  },
+  {
+    name: "App Router",
+    slug: "app-router",
+    description:
+      "Next.js의 app 폴더 구조를 이용해 페이지 주소와 공통 화면 구조를 구성하는 라우팅 방식입니다.",
+    category: "Next.js",
+    tags: ["라우팅"],
+  },
+  {
+    name: "Layout",
+    slug: "layout",
+    description:
+      "여러 페이지가 함께 사용하는 화면 구조입니다. 공통 메뉴나 페이지를 감싸는 틀을 구성할 때 사용합니다.",
+    category: "Next.js",
+    tags: ["공통 UI"],
+  },
+  {
+    name: "동적 라우팅",
+    slug: "dynamic-routing",
+    description:
+      "주소의 일부를 변수처럼 사용해 서로 다른 내용을 보여주는 방식입니다. 단어 슬러그에 따라 해당 단어의 상세 화면을 보여줄 수 있습니다.",
+    category: "Next.js",
+    tags: ["라우팅", "URL"],
+  },
+  {
+    name: "서버 컴포넌트",
+    slug: "server-component",
+    description:
+      "서버에서 실행되는 React 컴포넌트입니다. 데이터베이스에서 데이터를 가져오고 화면을 구성할 수 있습니다.",
+    category: "Next.js",
+    tags: ["서버", "React"],
+  },
+  {
+    name: "Server Action",
+    slug: "server-action",
+    description:
+      "폼 제출이나 버튼 동작에서 호출하여 서버에서 실행하는 비동기 함수입니다. 데이터를 등록하거나 수정하는 작업에 사용할 수 있습니다.",
+    category: "Next.js",
+    tags: ["서버", "폼"],
+  },
+  {
+    name: "변수",
+    slug: "variable",
+    description:
+      "값을 저장하고 이름을 붙여 다시 사용할 수 있게 하는 방법입니다. 사용자 이름이나 검색어 같은 값을 다룰 때 사용합니다.",
+    category: "JavaScript",
+    tags: ["기초 문법"],
+  },
+  {
+    name: "함수",
+    slug: "function",
+    description:
+      "특정 작업을 수행하는 코드를 묶어 두고 필요할 때 호출하는 단위입니다. 값을 전달받고 처리 결과를 반환할 수 있습니다.",
+    category: "JavaScript",
+    tags: ["재사용"],
+  },
+  {
+    name: "배열",
+    slug: "array",
+    description:
+      "여러 값을 순서대로 담는 자료형입니다. 여러 단어의 목록이나 한 단어의 태그를 저장할 때 사용할 수 있습니다.",
+    category: "JavaScript",
+    tags: ["자료형", "목록"],
+  },
+  {
+    name: "객체",
+    slug: "object",
+    description:
+      "관련된 데이터를 속성 이름과 값의 쌍으로 묶는 자료형입니다. 단어 하나의 이름, 설명, 카테고리를 함께 표현할 수 있습니다.",
+    category: "JavaScript",
+    tags: ["자료형"],
+  },
+  {
+    name: "Promise",
+    slug: "promise",
+    description:
+      "비동기 작업의 성공 결과나 실패 이유를 다루는 객체입니다. 서버 요청처럼 결과가 나중에 준비되는 상황에 사용합니다.",
+    category: "JavaScript",
+    tags: ["비동기"],
+  },
+  {
+    name: "Git",
+    slug: "git",
+    description:
+      "파일의 변경 이력을 기록하고 관리하는 버전 관리 도구입니다. 이전 변경을 확인하거나 여러 사람이 함께 개발할 때 사용합니다.",
+    category: "기타",
+    tags: ["버전 관리"],
+  },
+  {
+    name: "커밋",
+    slug: "commit",
+    description:
+      "Git에서 선택한 파일의 변경 내용을 하나의 기록으로 남기는 작업입니다. 어떤 변경인지 설명하는 메시지를 함께 작성합니다.",
+    category: "기타",
+    tags: ["Git", "변경 이력"],
+  },
+  {
+    name: "브랜치",
+    slug: "branch",
+    description:
+      "Git에서 다른 작업과 구분해 변경을 쌓아 갈 수 있는 개발 흐름입니다. 새 기능을 별도로 개발할 때 사용할 수 있습니다.",
+    category: "기타",
+    tags: ["Git"],
+  },
+  {
+    name: "디버깅",
+    slug: "debugging",
+    description:
+      "프로그램이 예상과 다르게 동작하는 원인을 찾고 수정하는 과정입니다. 오류 메시지나 변수 값을 확인하며 문제를 좁혀 갑니다.",
+    category: "기타",
+    tags: [],
+  },
+  {
+    name: "리팩터링",
+    slug: "refactoring",
+    description:
+      "프로그램의 외부 동작을 유지하면서 내부 코드 구조를 개선하는 작업입니다. 읽기 쉽고 수정하기 편한 코드로 정리하는 것이 목적입니다.",
+    category: "기타",
+    tags: ["코드 개선"],
+  },
+];
+
+const seedUsers = [
+  {
+    name: "관리자 학습자",
+    email: "learner1@example.com",
+    password: "DevStudy1!Pass",
+    role: "admin",
+  },
+  {
+    name: "React 학습자",
+    email: "learner2@example.com",
+    password: "DevStudy2!Pass",
+    role: "user",
+  },
+  {
+    name: "JavaScript 학습자",
+    email: "learner3@example.com",
+    password: "DevStudy3!Pass",
+    role: "user",
+  },
+];
+
+const seedMemos = [
+  {
+    userEmail: "learner1@example.com",
+    wordSlug: "http",
+    content:
+      "요청은 클라이언트가 보내고 응답은 서버가 보낸다. 브라우저에서 페이지를 여는 상황으로 생각해 보자.",
+  },
+  {
+    userEmail: "learner2@example.com",
+    wordSlug: "use-state",
+    content:
+      "입력창의 값처럼 화면에서 바뀌는 데이터를 관리할 때 사용한다. 상태를 변경하는 함수와 함께 사용한다는 점을 기억하자.",
+  },
+  {
+    userEmail: "learner3@example.com",
+    wordSlug: "array",
+    content:
+      "여러 단어를 하나의 목록으로 담을 수 있다. 첫 번째 항목의 인덱스는 0이고 태그도 배열로 저장한다.",
+  },
+];
+
+function loadLocalEnvironmentVariables() {
+  const environmentFilePaths = [
+    resolve(process.cwd(), ".env.local"),
+    resolve(process.cwd(), ".env"),
+  ];
+
+  for (const environmentFilePath of environmentFilePaths) {
+    if (existsSync(environmentFilePath)) {
+      process.loadEnvFile(environmentFilePath);
+    }
+  }
+}
+
+function validateSeedData() {
+  if (seedWords.length !== 30) {
+    throw new Error("초기 단어는 정확히 30개여야 합니다.");
+  }
+
+  for (const category of categories) {
+    const wordCount = seedWords.filter(
+      (word) => word.category === category
+    ).length;
+
+    if (wordCount !== 5) {
+      throw new Error(
+        `${category} 카테고리에는 정확히 5개의 단어가 필요합니다.`
+      );
+    }
+  }
+
+  const slugs = new Set();
+
+  for (const word of seedWords) {
+    if (!word.name.trim() || !word.description.trim()) {
+      throw new Error("모든 단어에는 이름과 설명이 필요합니다.");
+    }
+
+    if (!categories.includes(word.category)) {
+      throw new Error(`${word.name}의 카테고리가 올바르지 않습니다.`);
+    }
+
+    if (!/^[a-z0-9-]+$/.test(word.slug)) {
+      throw new Error(
+        `${word.name}의 slug는 영문 소문자, 숫자, 하이픈만 사용할 수 있습니다.`
+      );
+    }
+
+    if (slugs.has(word.slug)) {
+      throw new Error(`${word.slug} slug가 중복되었습니다.`);
+    }
+
+    if (
+      !Array.isArray(word.tags) ||
+      word.tags.some((tag) => typeof tag !== "string" || !tag.trim())
+    ) {
+      throw new Error(`${word.name}의 tags는 문자열 배열이어야 합니다.`);
+    }
+
+    slugs.add(word.slug);
+  }
+
+  if (seedUsers.length !== 3) {
+    throw new Error("초기 사용자는 정확히 3명이어야 합니다.");
+  }
+
+  const emails = new Set();
+
+  for (const user of seedUsers) {
+    if (!user.email.includes("@")) {
+      throw new Error(`${user.email}은 올바른 이메일 형식이 아닙니다.`);
+    }
+
+    if (user.password.length < 4) {
+      throw new Error(`${user.email}의 비밀번호는 4자 이상이어야 합니다.`);
+    }
+
+    if (!new Set(["admin", "user"]).has(user.role)) {
+      throw new Error(`${user.email}의 역할이 올바르지 않습니다.`);
+    }
+
+    if (emails.has(user.email)) {
+      throw new Error(`${user.email} 이메일이 중복되었습니다.`);
+    }
+
+    emails.add(user.email);
+  }
+
+  const adminCount = seedUsers.filter((user) => user.role === "admin").length;
+
+  if (adminCount !== 1) {
+    throw new Error("초기 사용자 중 관리자는 정확히 1명이어야 합니다.");
+  }
+
+  if (seedMemos.length !== 3) {
+    throw new Error("초기 개인 메모는 정확히 3개여야 합니다.");
+  }
+
+  const wordsBySlug = new Map(seedWords.map((word) => [word.slug, word]));
+  const memoCategories = new Set();
+
+  for (const memo of seedMemos) {
+    if (!emails.has(memo.userEmail)) {
+      throw new Error(`${memo.userEmail} 사용자를 초기 사용자에서 찾지 못했습니다.`);
+    }
+
+    const memoWord = wordsBySlug.get(memo.wordSlug);
+
+    if (!memoWord) {
+      throw new Error(`${memo.wordSlug} 단어를 초기 단어에서 찾지 못했습니다.`);
+    }
+
+    if (!memo.content.trim()) {
+      throw new Error(`${memo.wordSlug} 메모의 내용이 비어 있습니다.`);
+    }
+
+    memoCategories.add(memoWord.category);
+  }
+
+  if (memoCategories.size !== seedMemos.length) {
+    throw new Error("초기 개인 메모는 서로 다른 카테고리의 단어에 작성해야 합니다.");
+  }
+}
+
+async function createIndexes(database) {
+  await database.collection("words").createIndex(
+    { slug: 1 },
+    {
+      unique: true,
+      name: "unique_word_slug",
+    }
+  );
+
+  await database.collection("memos").createIndex(
+    { userId: 1, wordId: 1 },
+    {
+      unique: true,
+      name: "unique_memo_per_user_and_word",
+    }
+  );
+
+  await database.collection("wordRequests").createIndex(
+    { userId: 1, normalizedWord: 1 },
+    {
+      unique: true,
+      name: "unique_pending_word_request_per_user",
+      partialFilterExpression: {
+        status: "pending",
+      },
+    }
+  );
+
+  await database.collection("wordEditRequests").createIndex(
+    { userId: 1, wordId: 1 },
+    {
+      unique: true,
+      name: "unique_pending_word_edit_request_per_user",
+      partialFilterExpression: {
+        status: "pending",
+      },
+    }
+  );
+}
+
+async function seedTestUsers(auth, database) {
+  const userCollection = database.collection("user");
+  const userIdsByEmail = new Map();
+
+  for (const seedUser of seedUsers) {
+    const email = seedUser.email.toLowerCase();
+    const existingUser = await userCollection.findOne({ email });
+
+    if (existingUser) {
+      const existingUserId = existingUser._id?.toString() ?? existingUser.id;
+
+      if (!existingUserId) {
+        throw new Error(`${email} 사용자의 ID를 확인하지 못했습니다.`);
+      }
+
+      userIdsByEmail.set(email, existingUserId);
+      console.log(`[유지] 사용자: ${email}`);
+      continue;
+    }
+
+    const created = await auth.api.createUser({
+      body: {
+        name: seedUser.name,
+        email,
+        password: seedUser.password,
+        role: seedUser.role,
+      },
+    });
+
+    const createdUserId = created?.user?.id;
+
+    if (!createdUserId) {
+      throw new Error(`${email} 사용자를 생성했지만 ID를 받지 못했습니다.`);
+    }
+
+    userIdsByEmail.set(email, createdUserId);
+    console.log(`[추가] 사용자: ${email} (${seedUser.role})`);
+  }
+
+  return userIdsByEmail;
+}
+
+async function seedDictionaryWords(database) {
+  const wordCollection = database.collection("words");
+  const wordIdsBySlug = new Map();
+
+  for (const seedWord of seedWords) {
+    const existingWord = await wordCollection.findOne({
+      slug: seedWord.slug,
+    });
+
+    if (existingWord) {
+      wordIdsBySlug.set(seedWord.slug, existingWord._id.toString());
+      console.log(`[유지] 단어: ${seedWord.name}`);
+      continue;
+    }
+
+    const now = new Date();
+    const insertResult = await wordCollection.insertOne({
+      ...seedWord,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    wordIdsBySlug.set(seedWord.slug, insertResult.insertedId.toString());
+    console.log(`[추가] 단어: ${seedWord.name}`);
+  }
+
+  return wordIdsBySlug;
+}
+
+async function seedPersonalMemos(database, userIdsByEmail, wordIdsBySlug) {
+  const memoCollection = database.collection("memos");
+
+  for (const seedMemo of seedMemos) {
+    const userId = userIdsByEmail.get(seedMemo.userEmail);
+    const wordId = wordIdsBySlug.get(seedMemo.wordSlug);
+
+    if (!userId || !wordId) {
+      throw new Error(
+        `${seedMemo.userEmail}의 ${seedMemo.wordSlug} 메모 연결 정보를 찾지 못했습니다.`
+      );
+    }
+
+    const existingMemo = await memoCollection.findOne({
+      userId,
+      wordId,
+    });
+
+    if (existingMemo) {
+      console.log(
+        `[유지] 개인 메모: ${seedMemo.userEmail} / ${seedMemo.wordSlug}`
+      );
+      continue;
+    }
+
+    const now = new Date();
+
+    await memoCollection.insertOne({
+      userId,
+      wordId,
+      content: seedMemo.content,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    console.log(
+      `[추가] 개인 메모: ${seedMemo.userEmail} / ${seedMemo.wordSlug}`
+    );
+  }
+}
+
+function printDryRunResult() {
+  console.log("Seed 데이터 검증을 통과했습니다.");
+  console.log(`카테고리: ${categories.length}개`);
+
+  for (const category of categories) {
+    const wordCount = seedWords.filter(
+      (word) => word.category === category
+    ).length;
+
+    console.log(`- ${category}: ${wordCount}개`);
+  }
+
+  console.log(`테스트 사용자: ${seedUsers.length}명`);
+  console.log(`개인 메모: ${seedMemos.length}개`);
+  console.log("--dry-run에서는 MongoDB 데이터를 변경하지 않았습니다.");
+}
+
+async function runSeed() {
+  loadLocalEnvironmentVariables();
+  validateSeedData();
+
+  const isDryRun = process.argv.includes("--dry-run");
+
+  if (isDryRun) {
+    printDryRunResult();
+    return;
+  }
+
+  const mongoUri = process.env.MONGODB_URI;
+  const mongoDatabaseName = process.env.MONGODB_DB_NAME || "dev-words";
+  const betterAuthSecret = process.env.BETTER_AUTH_SECRET;
+
+  if (!mongoUri) {
+    throw new Error("MONGODB_URI 환경 변수가 필요합니다.");
+  }
+
+  if (!betterAuthSecret || betterAuthSecret.length < 32) {
+    throw new Error("BETTER_AUTH_SECRET은 32자 이상이어야 합니다.");
+  }
+
+  const client = new MongoClient(mongoUri);
+
+  try {
+    await client.connect();
+
+    const database = client.db(mongoDatabaseName);
+    const auth = betterAuth({
+      secret: betterAuthSecret,
+      baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+      database: mongodbAdapter(database, {
+        transaction: false,
+      }),
+      emailAndPassword: {
+        enabled: true,
+        minPasswordLength: 4,
+        autoSignIn: false,
+      },
+      plugins: [
+        adminPlugin({
+          defaultRole: "user",
+          adminRoles: ["admin"],
+        }),
+      ],
+    });
+
+    console.log(`MongoDB 연결 완료: ${mongoDatabaseName}`);
+
+    await createIndexes(database);
+
+    const userIdsByEmail = await seedTestUsers(auth, database);
+    const wordIdsBySlug = await seedDictionaryWords(database);
+
+    await seedPersonalMemos(database, userIdsByEmail, wordIdsBySlug);
+
+    console.log("초기 데이터 저장을 완료했습니다.");
+  } finally {
+    await client.close();
+  }
+}
+
+try {
+  await runSeed();
+} catch (error) {
+  console.error("Seed 실행 실패:", error.message);
+  process.exitCode = 1;
+}
