@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import QuizEntry from "./quiz-entry";
 import NewWordRequest from "./new-word-request";
 import WordActions from "@/components/word-actions";
 import { findFavorites } from "@/lib/activity/data";
@@ -24,6 +25,15 @@ export default async function Home({ searchParams }) {
 
   return (
     <main>
+      {session?.user?.role !== "admin" && (
+        <section className="quiz-banner" aria-labelledby="home-quiz-heading">
+          <div>
+            <h2 id="home-quiz-heading">배운 단어, 퀴즈로 확인해 볼까요?</h2>
+            <p>AI가 만드는 랜덤 5문제 · 하루 5회 도전</p>
+          </div>
+          <QuizEntry isLoggedIn={session?.user?.role === "user"} />
+        </section>
+      )}
       <section aria-labelledby="word-search-heading">
         <h2 id="word-search-heading">단어 검색</h2>
         <form action="/" method="get" className="search-form">

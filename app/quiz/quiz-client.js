@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { generateQuiz, submitQuiz } from "./actions";
+import QuizQuestions from "./quiz-questions";
 import { QUIZ_DIFFICULTIES } from "@/lib/ai/validation";
 
 const initialActionState = {
@@ -59,36 +60,14 @@ export default function QuizClient() {
 
   if (quizState.questions) {
     return (
-      <section aria-labelledby="quiz-question-heading">
-        <h2 id="quiz-question-heading">{quizState.difficulty} AI 퀴즈</h2>
-        <form action={resultFormAction}>
-          <input type="hidden" name="quizId" value={quizState.quizId} />
-          <ol className="quiz-question-list">
-            {quizState.questions.map((question, questionIndex) => (
-              <li key={question.wordId}>
-                <fieldset>
-                  <legend>{question.question}</legend>
-                  {question.choices.map((choice, choiceIndex) => (
-                    <label key={choice} className="quiz-choice">
-                      <input
-                        type="radio"
-                        name={`answer-${questionIndex}`}
-                        value={choiceIndex}
-                        required
-                      />
-                      {choice}
-                    </label>
-                  ))}
-                </fieldset>
-              </li>
-            ))}
-          </ol>
-          <button type="submit" disabled={isSubmitPending}>
-            {isSubmitPending ? "채점 중..." : "정답 제출"}
-          </button>
-          <ActionMessage state={resultState} />
-        </form>
-      </section>
+      <QuizQuestions
+        key={quizState.quizId}
+        quiz={quizState}
+        formAction={resultFormAction}
+        isPending={isSubmitPending}
+      >
+        <ActionMessage state={resultState} />
+      </QuizQuestions>
     );
   }
 

@@ -411,6 +411,29 @@ dialog {
   padding-left: 1.5rem;
 }
 
+main > .quiz-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--standard-border-radius);
+}
+
+.quiz-banner h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-banner p,
+.quiz-banner .button,
+.quiz-banner button {
+  margin: 0;
+}
+
 .quiz-choice {
   display: block;
   margin: 0.65rem 0;
