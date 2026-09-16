@@ -718,6 +718,45 @@ async function createIndexes(database) {
       },
     }
   );
+
+  // 하루 동안의 AI 기능 사용 횟수를 사용자와 기능 종류별로 하나만 저장합니다.
+  await database.collection("aiUsage").createIndex(
+    { userId: 1, type: 1, dateKey: 1 },
+    {
+      unique: true,
+      name: "unique_ai_usage_per_user_type_and_day",
+    }
+  );
+
+  // 같은 사용자가 같은 종류의 AI 실행을 동시에 시작하지 못하게 합니다.
+  await database.collection("aiRuns").createIndex(
+    { userId: 1, type: 1 },
+    {
+      unique: true,
+      name: "unique_running_ai_request_per_user_and_type",
+      partialFilterExpression: {
+        status: "running",
+      },
+    }
+  );
+
+  // 비정상 종료로 남은 AI 실행 잠금은 2분 뒤 자동으로 정리합니다.
+  await database.collection("aiRuns").createIndex(
+    { expiresAt: 1 },
+    {
+      expireAfterSeconds: 0,
+      name: "expire_old_ai_runs",
+    }
+  );
+
+  // 정답을 서버에만 보관하는 임시 퀴즈 세션은 1시간 뒤 자동으로 정리합니다.
+  await database.collection("quizSessions").createIndex(
+    { expiresAt: 1 },
+    {
+      expireAfterSeconds: 0,
+      name: "expire_quiz_sessions",
+    }
+  );
 }
 
 // 이메일로 기존 사용자를 확인하고, 없는 사용자만 Better Auth로 생성합니다.

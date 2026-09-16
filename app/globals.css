@@ -186,6 +186,18 @@ dialog {
   margin-top: 1rem;
 }
 
+.empty-result-actions,
+.admin-word-form,
+.ai-word-request-form {
+  display: inline-block;
+  margin: 0.5rem 0.5rem 0 0;
+}
+
+.admin-word-form form,
+.ai-word-request-form {
+  margin-top: 1rem;
+}
+
 .request-accordion {
   margin-top: 2rem;
 }
@@ -286,6 +298,17 @@ dialog {
 
 .status-message.success {
   color: var(--accent);
+}
+
+.quiz-question-list {
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.5rem;
+}
+
+.quiz-choice {
+  display: block;
+  margin: 0.5rem 0;
 }
 
 @media (max-width: 48rem) {

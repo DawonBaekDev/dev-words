@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import NewWordRequest from "./new-word-request";
+import AiWordRequest from "./ai-word-request";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findWords } from "@/lib/words/data";
 import {
@@ -73,10 +74,16 @@ export default async function Home({ searchParams }) {
               검색어의 철자를 확인하거나 전체 카테고리에서 다시 찾아보세요.
             </p>
             {filters.query && (
-              <NewWordRequest
-                query={filters.query}
-                userRole={session?.user?.role ?? null}
-              />
+              <div className="empty-result-actions">
+                <AiWordRequest
+                  query={filters.query}
+                  userRole={session?.user?.role ?? null}
+                />
+                <NewWordRequest
+                  query={filters.query}
+                  userRole={session?.user?.role ?? null}
+                />
+              </div>
             )}
           </div>
         ) : (

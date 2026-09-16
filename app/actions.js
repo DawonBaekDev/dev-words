@@ -7,6 +7,8 @@ import {
   updatePendingWordRequest,
 } from "@/lib/word-requests/data";
 import { validateRequestedWord } from "@/lib/word-requests/validation";
+import { updatePendingWordEditRequest } from "@/lib/word-edit-requests/data";
+import { validateWordEditRequestMessage } from "@/lib/word-edit-requests/validation";
 import { findWordByExactName } from "@/lib/words/data";
 
 function actionResult(type, message) {
@@ -150,6 +152,45 @@ export async function editWordRequest(requestId, previousState, formData) {
     return actionResult(
       "error",
       "요청 내용을 수정하지 못했습니다. 잠시 후 다시 시도해 주세요."
+    );
+  }
+}
+
+export async function editWordEditRequest(requestId, previousState, formData) {
+  const authorization = await validateGeneralUserRequest();
+
+  if (authorization.error) {
+    return authorization.error;
+  }
+
+  const validation = validateWordEditRequestMessage(formData.get("message"));
+
+  if (validation.error) {
+    return actionResult("error", validation.error);
+  }
+
+  try {
+    const result = await updatePendingWordEditRequest({
+      requestId,
+      userId: authorization.session.user.id,
+      message: validation.message,
+    });
+
+    if (result.reason === "unavailable") {
+      return actionResult("error", "대기 중인 본인 요청만 수정할 수 있습니다.");
+    }
+
+    if (result.reason === "unchanged") {
+      return actionResult("success", "변경된 수정 요청 내용이 없습니다.");
+    }
+
+    refresh();
+    return actionResult("success", "수정 요청 내용이 수정되었습니다.");
+  } catch (error) {
+    console.error("수정 요청 내용 수정 실패:", error);
+    return actionResult(
+      "error",
+      "수정 요청 내용을 수정하지 못했습니다. 잠시 후 다시 시도해 주세요."
     );
   }
 }

@@ -2,7 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
+import AdminEditRequestItem from "./edit-request-item";
+import AdminWordRequestGroup from "./word-request-group";
+import AdminWordForm from "./word-form";
+import { findPendingWordEditRequests } from "@/lib/word-edit-requests/data";
 import { findPendingWordRequestGroups } from "@/lib/word-requests/data";
+import { findWordsByIds } from "@/lib/words/data";
 
 export const metadata = {
   title: "관리자 페이지",
@@ -29,7 +34,16 @@ export default async function AdminPage() {
     redirect("/mypage");
   }
 
-  const requestGroups = await findPendingWordRequestGroups();
+  const [requestGroups, editRequests] = await Promise.all([
+    findPendingWordRequestGroups(),
+    findPendingWordEditRequests(),
+  ]);
+  const editedWords = await findWordsByIds(
+    editRequests.map((request) => request.wordId)
+  );
+  const wordsById = new Map(
+    editedWords.map((word) => [word._id.toString(), word])
+  );
   const pendingRequestCount = requestGroups.reduce(
     (total, group) => total + group.requestCount,
     0
@@ -44,6 +58,10 @@ export default async function AdminPage() {
       <section aria-labelledby="admin-heading">
         <h2 id="admin-heading">관리자 페이지</h2>
         <p>사용자가 요청한 새 단어 알림을 최신 요청부터 확인하세요.</p>
+        <p>
+          <Link href="/quiz">AI 퀴즈</Link>
+        </p>
+        <AdminWordForm />
       </section>
 
       <details open className="request-accordion">
@@ -55,27 +73,46 @@ export default async function AdminPage() {
           <ul className="request-list admin-request-list">
             {requestGroups.map((group) => (
               <li key={group._id}>
-                <article className="request-card">
-                  <div className="request-heading">
-                    <h3>{group.requestedWord}</h3>
-                    <span className="request-status pending">처리 중</span>
-                  </div>
-                  <p>
-                    <strong>요청 인원:</strong> {group.requestCount}명
-                  </p>
-                  <dl className="request-dates">
-                    <div>
-                      <dt>첫 요청</dt>
-                      <dd>{formatDateTime(group.firstRequestedAt)}</dd>
-                    </div>
-                    <div>
-                      <dt>최근 요청</dt>
-                      <dd>{formatDateTime(group.lastRequestedAt)}</dd>
-                    </div>
-                  </dl>
-                </article>
+                <AdminWordRequestGroup
+                  group={{
+                    normalizedWord: group._id,
+                    requestedWord: group.requestedWord,
+                    requestCount: group.requestCount,
+                    firstRequestedAt: formatDateTime(group.firstRequestedAt),
+                    lastRequestedAt: formatDateTime(group.lastRequestedAt),
+                  }}
+                />
               </li>
             ))}
+          </ul>
+        )}
+      </details>
+
+      <details open className="request-accordion">
+        <summary>기존 단어 수정 요청 {editRequests.length}건</summary>
+
+        {editRequests.length === 0 ? (
+          <p>현재 확인할 기존 단어 수정 요청이 없습니다.</p>
+        ) : (
+          <ul className="request-list admin-request-list">
+            {editRequests.map((request) => {
+              const word = wordsById.get(request.wordId);
+
+              return (
+                <li key={request._id.toString()}>
+                  <AdminEditRequestItem
+                    request={{
+                      id: request._id.toString(),
+                      message: request.message,
+                      createdAt: formatDateTime(request.createdAt),
+                      updatedAt: formatDateTime(request.updatedAt),
+                      wordName: word?.name ?? "",
+                      wordSlug: word?.slug ?? "",
+                    }}
+                  />
+                </li>
+              );
+            })}
           </ul>
         )}
       </details>

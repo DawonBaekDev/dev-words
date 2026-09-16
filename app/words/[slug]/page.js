@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import GuestMemoButton from "./guest-memo-button";
 import MemoSection from "./memo-section";
+import EditRequestSection from "./edit-request-section";
+import AdminWordManagement from "./admin-word-management";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findMemoByUserAndWord } from "@/lib/memos/data";
+import { findPendingWordEditRequest } from "@/lib/word-edit-requests/data";
 import { findWordBySlug } from "@/lib/words/data";
 import { CODE_LANGUAGE_LABELS } from "@/lib/words/search";
 
@@ -32,7 +35,7 @@ function WordMeaning({ meaning }) {
   );
 }
 
-export default async function WordDetailPage({ params }) {
+export default async function WordDetailPage({ params, searchParams }) {
   await connection();
 
   const { slug } = await params;
@@ -44,12 +47,20 @@ export default async function WordDetailPage({ params }) {
 
   const session = await getCurrentSession();
   const isGeneralUser = session?.user?.role === "user";
-  const existingMemo = isGeneralUser
-    ? await findMemoByUserAndWord(
-        session.user.id,
-        word._id.toString()
-      )
-    : null;
+  const [existingMemo, pendingEditRequest] = isGeneralUser
+    ? await Promise.all([
+        findMemoByUserAndWord(session.user.id, word._id.toString()),
+        findPendingWordEditRequest({
+          userId: session.user.id,
+          wordId: word._id.toString(),
+        }),
+      ])
+    : [null, null];
+  const requestedEditRequestId = (await searchParams).editRequestId;
+  const editRequestId =
+    session?.user?.role === "admin" && typeof requestedEditRequestId === "string"
+      ? requestedEditRequestId
+      : "";
   const memo = existingMemo
     ? {
         content: existingMemo.content,
@@ -101,6 +112,32 @@ export default async function WordDetailPage({ params }) {
         )}
 
         {isGeneralUser && <MemoSection slug={slug} memo={memo} />}
+        {isGeneralUser && (
+          <EditRequestSection
+            slug={slug}
+            request={
+              pendingEditRequest
+                ? { message: pendingEditRequest.message }
+                : null
+            }
+          />
+        )}
+
+        {session?.user?.role === "admin" && (
+          <AdminWordManagement
+            editRequestId={editRequestId}
+            word={{
+              name: word.name,
+              meaning: word.meaning,
+              slug: word.slug,
+              description: word.description,
+              category: word.category,
+              tags: word.tags,
+              codeExample: word.codeExample,
+              codeLanguage: word.codeLanguage,
+            }}
+          />
+        )}
       </article>
     </main>
   );
