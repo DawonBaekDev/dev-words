@@ -2,14 +2,23 @@
   --content-width: 72rem;
 }
 
-body > header,
+body {
+  grid-template-columns: 1fr min(var(--content-width), calc(100% - 2rem)) 1fr;
+}
+
 body > main,
 body > footer {
-  max-width: var(--content-width);
+  min-width: 0;
+}
+
+body > header {
+  padding-inline: 1rem;
 }
 
 body > header nav {
-  justify-content: flex-start;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  justify-content: space-between;
 }
 
 body > header nav a {
@@ -27,6 +36,7 @@ body > header nav a {
 .auth-controls,
 .form-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
 }
@@ -38,6 +48,7 @@ body > header nav a {
 
 .auth-email {
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 dialog {
@@ -80,6 +91,13 @@ dialog {
   grid-column: 1;
 }
 
+.search-form input,
+.search-form select {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
 .search-form select {
   grid-column: 2;
   grid-row: 2;
@@ -118,12 +136,14 @@ dialog {
 .word-list {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
 }
 
 .word-list > li,
 .empty-result,
 .word-detail {
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding: 1.25rem;
   border: 1px solid var(--border);
   border-radius: var(--standard-border-radius);
@@ -313,11 +333,20 @@ dialog {
 
 @media (max-width: 48rem) {
   .search-form {
-    display: block;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .search-form label:first-of-type,
+  .search-form label:last-of-type,
+  .search-form input,
+  .search-form select,
+  .search-actions {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .search-actions {
-    margin-top: 1rem;
+    flex-wrap: wrap;
   }
 
   .site-nav,
