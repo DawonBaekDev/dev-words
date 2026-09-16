@@ -1,0 +1,139 @@
+:root {
+  --content-width: 72rem;
+}
+
+body > header,
+body > main,
+body > footer {
+  max-width: var(--content-width);
+}
+
+body > header nav {
+  justify-content: flex-start;
+}
+
+body > header nav a {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.search-form {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr) auto;
+  align-items: end;
+}
+
+.search-form label {
+  margin-bottom: -0.5rem;
+}
+
+.search-form label:first-of-type {
+  grid-column: 1;
+}
+
+.search-form label:last-of-type {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.search-form input {
+  grid-column: 1;
+}
+
+.search-form select {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.search-actions {
+  display: flex;
+  gap: 0.5rem;
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.search-actions > * {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.secondary-button {
+  background: var(--accent-bg);
+  color: var(--text);
+}
+
+.section-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.word-list,
+.tag-list {
+  padding: 0;
+  list-style: none;
+}
+
+.word-list {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.word-list > li,
+.empty-result,
+.word-detail {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--standard-border-radius);
+}
+
+.word-list article {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.word-category,
+.code-language {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0 0;
+}
+
+.tag-list li {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  font-size: 0.85rem;
+}
+
+.word-detail > header {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.word-detail pre {
+  margin-bottom: 0;
+}
+
+@media (max-width: 48rem) {
+  .search-form {
+    display: block;
+  }
+
+  .search-actions {
+    margin-top: 1rem;
+  }
+}
