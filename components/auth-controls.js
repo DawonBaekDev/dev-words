@@ -133,6 +133,8 @@ export default function AuthControls({ user }) {
             type="email"
             autoComplete="email"
             required
+            readOnly
+            value="learner2@example.com"
           />
 
           <label htmlFor="auth-password">비밀번호</label>
@@ -140,6 +142,8 @@ export default function AuthControls({ user }) {
             id="auth-password"
             name="password"
             type="password"
+            readOnly
+            value="DevStudy2!Pass"
             autoComplete={
               mode === "login" ? "current-password" : "new-password"
             }
