@@ -1,0 +1,327 @@
+:root {
+  --content-width: 72rem;
+}
+
+body > header,
+body > main,
+body > footer {
+  max-width: var(--content-width);
+}
+
+body > header nav {
+  justify-content: flex-start;
+}
+
+body > header nav a {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-controls,
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.auth-controls > :not(dialog),
+.form-actions > * {
+  margin: 0;
+}
+
+.auth-email {
+  font-size: 0.9rem;
+}
+
+dialog {
+  width: min(28rem, calc(100% - 2rem));
+}
+
+.dialog-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dialog-heading h2,
+.dialog-heading button {
+  margin-top: 0;
+}
+
+.search-form {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr) auto;
+  align-items: end;
+}
+
+.search-form label {
+  margin-bottom: -0.5rem;
+}
+
+.search-form label:first-of-type {
+  grid-column: 1;
+}
+
+.search-form label:last-of-type {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.search-form input {
+  grid-column: 1;
+}
+
+.search-form select {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.search-actions {
+  display: flex;
+  gap: 0.5rem;
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.search-actions > * {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.secondary-button {
+  background: var(--accent-bg);
+  color: var(--text);
+}
+
+.section-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.word-list,
+.tag-list {
+  padding: 0;
+  list-style: none;
+}
+
+.word-list {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.word-list > li,
+.empty-result,
+.word-detail {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--standard-border-radius);
+}
+
+.word-list article {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.word-category,
+.code-language {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0 0;
+}
+
+.tag-list li {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  font-size: 0.85rem;
+}
+
+.word-detail > header {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.word-meaning {
+  color: var(--text-light);
+  font-size: 1.05rem;
+}
+
+.word-detail pre {
+  margin-bottom: 0;
+}
+
+.memo-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.word-request-form {
+  margin-top: 1rem;
+}
+
+.word-request-form form {
+  margin-top: 1rem;
+}
+
+.empty-result-actions,
+.admin-word-form,
+.ai-word-request-form {
+  display: inline-block;
+  margin: 0.5rem 0.5rem 0 0;
+}
+
+.admin-word-form form,
+.ai-word-request-form {
+  margin-top: 1rem;
+}
+
+.request-accordion {
+  margin-top: 2rem;
+}
+
+.request-accordion summary {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.request-list {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.request-card {
+  margin: 0;
+  padding: 1rem;
+}
+
+.request-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.request-heading h3 {
+  margin-top: 0;
+}
+
+.request-status {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.request-status.completed {
+  color: var(--accent);
+}
+
+.request-status.rejected,
+.deleted-word {
+  color: var(--code);
+}
+
+.request-dates {
+  font-size: 0.9rem;
+}
+
+.request-dates div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.request-dates dt {
+  font-weight: 700;
+}
+
+.request-dates dd {
+  margin: 0;
+}
+
+.memo-content {
+  padding: 1rem;
+  border-radius: var(--standard-border-radius);
+  background: var(--accent-bg);
+}
+
+.memo-content dl {
+  font-size: 0.9rem;
+}
+
+.memo-content dl div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.memo-content dt {
+  font-weight: 700;
+}
+
+.memo-content dd {
+  margin: 0;
+}
+
+.status-message {
+  font-weight: 700;
+}
+
+.status-message.error {
+  color: var(--code);
+}
+
+.status-message.success {
+  color: var(--accent);
+}
+
+.quiz-question-list {
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.5rem;
+}
+
+.quiz-choice {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 48rem) {
+  .search-form {
+    display: block;
+  }
+
+  .search-actions {
+    margin-top: 1rem;
+  }
+
+  .site-nav,
+  .auth-controls {
+    flex-wrap: wrap;
+  }
+}

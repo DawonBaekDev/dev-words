@@ -16,6 +16,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 작업 단위: 완료·검증 후 항상 git commit / push
 - 코드 작성: 초급자도 이해할 수 있게 명시적으로 작성, 과도한 축약과 불필요한 추상화·계층·라이브러리 금지
 - 지시형 주석: 작업 지침으로 해석해 최대한 반영
+- css는 simpledotcss를 활용한다. css는 최소 layout을 표현 하기 위한 정도로 일단 제한한다.
 
 ### 파일 구조
 
