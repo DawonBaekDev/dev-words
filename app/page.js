@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import NewWordRequest from "./new-word-request";
+import { getCurrentSession } from "@/lib/auth/session";
 import { findWords } from "@/lib/words/data";
 import {
   normalizeWordSearchParams,
@@ -10,7 +12,10 @@ export default async function Home({ searchParams }) {
   await connection();
 
   const filters = normalizeWordSearchParams(await searchParams);
-  const words = await findWords(filters);
+  const [words, session] = await Promise.all([
+    findWords(filters),
+    getCurrentSession(),
+  ]);
 
   return (
     <main>
@@ -67,6 +72,12 @@ export default async function Home({ searchParams }) {
             <p>
               검색어의 철자를 확인하거나 전체 카테고리에서 다시 찾아보세요.
             </p>
+            {filters.query && (
+              <NewWordRequest
+                query={filters.query}
+                userRole={session?.user?.role ?? null}
+              />
+            )}
           </div>
         ) : (
           <ul className="word-list">

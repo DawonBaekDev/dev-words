@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
@@ -97,6 +98,13 @@ export default function AuthControls({ user }) {
     return (
       <div className="auth-controls">
         <span className="auth-email">{user.email}</span>
+        <Link
+          href={user.role === "admin" ? "/admin" : "/mypage"}
+          role="button"
+          className="secondary-button"
+        >
+          {user.role === "admin" ? "관리자 페이지" : "마이페이지"}
+        </Link>
         <button type="button" onClick={handleSignOut} disabled={isSubmitting}>
           {isSubmitting ? "로그아웃 중..." : "로그아웃"}
         </button>
@@ -133,8 +141,6 @@ export default function AuthControls({ user }) {
             type="email"
             autoComplete="email"
             required
-            readOnly
-            value="learner2@example.com"
           />
 
           <label htmlFor="auth-password">비밀번호</label>
@@ -142,8 +148,6 @@ export default function AuthControls({ user }) {
             id="auth-password"
             name="password"
             type="password"
-            readOnly
-            value="DevStudy2!Pass"
             autoComplete={
               mode === "login" ? "current-password" : "new-password"
             }

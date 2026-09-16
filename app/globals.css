@@ -178,6 +178,81 @@ dialog {
   border-top: 1px solid var(--border);
 }
 
+.word-request-form {
+  margin-top: 1rem;
+}
+
+.word-request-form form {
+  margin-top: 1rem;
+}
+
+.request-accordion {
+  margin-top: 2rem;
+}
+
+.request-accordion summary {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.request-list {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.request-card {
+  margin: 0;
+  padding: 1rem;
+}
+
+.request-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.request-heading h3 {
+  margin-top: 0;
+}
+
+.request-status {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.request-status.completed {
+  color: var(--accent);
+}
+
+.request-status.rejected,
+.deleted-word {
+  color: var(--code);
+}
+
+.request-dates {
+  font-size: 0.9rem;
+}
+
+.request-dates div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.request-dates dt {
+  font-weight: 700;
+}
+
+.request-dates dd {
+  margin: 0;
+}
+
 .memo-content {
   padding: 1rem;
   border-radius: var(--standard-border-radius);
