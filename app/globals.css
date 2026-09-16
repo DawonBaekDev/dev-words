@@ -1,5 +1,10 @@
 :root {
   --content-width: 72rem;
+  --accent: #315bc4;
+  --accent-hover: #24469b;
+  --accent-bg: #f3f5fa;
+  --border: #dce1eb;
+  --standard-border-radius: 0.65rem;
 }
 
 body {
@@ -13,6 +18,30 @@ body > footer {
 
 body > header {
   padding-inline: 1rem;
+  padding-bottom: 2.5rem;
+}
+
+body > header h1 {
+  font-size: clamp(1.65rem, 3vw, 2.5rem);
+  line-height: 1.35;
+  letter-spacing: -0.04em;
+  word-break: keep-all;
+}
+
+body > header p {
+  color: var(--text-light);
+  word-break: keep-all;
+}
+
+main > section {
+  margin-block: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+main h2 {
+  margin-top: 0;
+  font-size: 1.65rem;
+  letter-spacing: -0.025em;
 }
 
 body > header nav {
@@ -24,6 +53,13 @@ body > header nav {
 body > header nav a {
   font-size: 1.15rem;
   font-weight: 700;
+}
+
+body > header nav > a {
+  border: 0;
+  padding-left: 0;
+  color: var(--text);
+  text-decoration: none;
 }
 
 .site-nav {
@@ -150,9 +186,57 @@ dialog {
 }
 
 .word-list article {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   margin: 0;
   padding: 0;
   border: 0;
+}
+
+.word-list > li {
+  display: flex;
+  flex-direction: column;
+}
+
+.word-list h3 {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 1.35rem;
+}
+
+.word-list h3 a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.word-list h3 a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.word-list p {
+  margin-block: 0.5rem;
+}
+
+.word-list .word-actions {
+  margin-top: auto;
+  padding-top: 1.25rem;
+}
+
+.word-actions button {
+  font-size: 0.9rem;
+}
+
+.word-actions button[aria-expanded="false"],
+.word-actions button[aria-pressed="false"] {
+  background: var(--bg);
+  color: var(--accent);
+  border-color: var(--border);
+}
+
+.empty-result {
+  background: var(--accent-bg);
+  padding: 1.5rem;
 }
 
 .word-category,
@@ -241,6 +325,7 @@ dialog {
 
 .request-heading {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   align-items: baseline;
   justify-content: space-between;
@@ -328,7 +413,22 @@ dialog {
 
 .quiz-choice {
   display: block;
-  margin: 0.5rem 0;
+  margin: 0.65rem 0;
+  padding: 0.5rem;
+  border-radius: var(--standard-border-radius);
+}
+
+.quiz-choice:has(input:checked) {
+  background: var(--accent-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #a7bfff;
+    --accent-hover: #cedbff;
+    --accent-bg: #252b38;
+    --border: #465064;
+  }
 }
 
 @media (max-width: 48rem) {
