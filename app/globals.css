@@ -17,6 +17,45 @@ body > header nav a {
   font-weight: 700;
 }
 
+.site-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-controls,
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.auth-controls > :not(dialog),
+.form-actions > * {
+  margin: 0;
+}
+
+.auth-email {
+  font-size: 0.9rem;
+}
+
+dialog {
+  width: min(28rem, calc(100% - 2rem));
+}
+
+.dialog-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dialog-heading h2,
+.dialog-heading button {
+  margin-top: 0;
+}
+
 .search-form {
   display: grid;
   gap: 0.75rem;
@@ -128,6 +167,47 @@ body > header nav a {
   margin-bottom: 0;
 }
 
+.memo-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.memo-content {
+  padding: 1rem;
+  border-radius: var(--standard-border-radius);
+  background: var(--accent-bg);
+}
+
+.memo-content dl {
+  font-size: 0.9rem;
+}
+
+.memo-content dl div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.memo-content dt {
+  font-weight: 700;
+}
+
+.memo-content dd {
+  margin: 0;
+}
+
+.status-message {
+  font-weight: 700;
+}
+
+.status-message.error {
+  color: var(--code);
+}
+
+.status-message.success {
+  color: var(--accent);
+}
+
 @media (max-width: 48rem) {
   .search-form {
     display: block;
@@ -135,5 +215,10 @@ body > header nav a {
 
   .search-actions {
     margin-top: 1rem;
+  }
+
+  .site-nav,
+  .auth-controls {
+    flex-wrap: wrap;
   }
 }

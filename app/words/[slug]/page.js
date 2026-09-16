@@ -1,8 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import GuestMemoButton from "./guest-memo-button";
+import MemoSection from "./memo-section";
+import { getCurrentSession } from "@/lib/auth/session";
+import { findMemoByUserAndWord } from "@/lib/memos/data";
 import { findWordBySlug } from "@/lib/words/data";
 import { CODE_LANGUAGE_LABELS } from "@/lib/words/search";
+
+function formatDateTime(date) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
 
 export default async function WordDetailPage({ params }) {
   await connection();
@@ -13,6 +25,22 @@ export default async function WordDetailPage({ params }) {
   if (!word) {
     notFound();
   }
+
+  const session = await getCurrentSession();
+  const isGeneralUser = session?.user?.role === "user";
+  const existingMemo = isGeneralUser
+    ? await findMemoByUserAndWord(
+        session.user.id,
+        word._id.toString()
+      )
+    : null;
+  const memo = existingMemo
+    ? {
+        content: existingMemo.content,
+        createdAt: formatDateTime(existingMemo.createdAt),
+        updatedAt: formatDateTime(existingMemo.updatedAt),
+      }
+    : null;
 
   return (
     <main>
@@ -47,6 +75,15 @@ export default async function WordDetailPage({ params }) {
             <code>{word.codeExample}</code>
           </pre>
         </section>
+
+        {!session?.user && (
+          <section className="memo-section" aria-labelledby="memo-heading">
+            <h3 id="memo-heading">개인 메모</h3>
+            <GuestMemoButton />
+          </section>
+        )}
+
+        {isGeneralUser && <MemoSection slug={slug} memo={memo} />}
       </article>
     </main>
   );
