@@ -58,9 +58,6 @@ export default async function AdminPage() {
       <section aria-labelledby="admin-heading">
         <h2 id="admin-heading">관리자 페이지</h2>
         <p>사용자가 요청한 새 단어 알림을 최신 요청부터 확인하세요.</p>
-        <p>
-          <Link href="/quiz">AI 퀴즈</Link>
-        </p>
         <AdminWordForm />
       </section>
 

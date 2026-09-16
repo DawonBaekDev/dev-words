@@ -1,6 +1,7 @@
 "use server";
 
 import { getCurrentSession } from "@/lib/auth/session";
+import { canUseAiQuiz } from "@/lib/ai/access";
 import {
   beginAiRun,
   consumeQuizSession,
@@ -27,16 +28,16 @@ function aiQuizErrorMessage(error) {
   return "퀴즈를 만들지 못했습니다. 다시 시도해 주세요.";
 }
 
-async function requireLoggedInUser() {
+async function getQuizUser() {
   const session = await getCurrentSession();
-  return session?.user ?? null;
+  return canUseAiQuiz(session?.user) ? session.user : null;
 }
 
 export async function generateQuiz(previousState, formData) {
-  const user = await requireLoggedInUser();
+  const user = await getQuizUser();
 
   if (!user) {
-    return actionResult("error", "로그인 후 AI 퀴즈를 이용해 주세요.");
+    return actionResult("error", "일반 사용자 계정으로 로그인한 뒤 AI 퀴즈를 이용해 주세요.");
   }
 
   const difficulty = formData.get("difficulty");
@@ -89,10 +90,10 @@ export async function generateQuiz(previousState, formData) {
 }
 
 export async function submitQuiz(previousState, formData) {
-  const user = await requireLoggedInUser();
+  const user = await getQuizUser();
 
   if (!user) {
-    return actionResult("error", "로그인 후 퀴즈를 제출해 주세요.");
+    return actionResult("error", "일반 사용자 계정으로 로그인한 뒤 퀴즈를 제출해 주세요.");
   }
 
   const quizId = formData.get("quizId");
