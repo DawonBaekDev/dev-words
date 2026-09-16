@@ -1,3 +1,6 @@
+import WordActions from "@/components/word-actions";
+import RecordView from "./record-view";
+import { findFavorites } from "@/lib/activity/data";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -56,7 +59,10 @@ export default async function WordDetailPage({ params, searchParams }) {
         }),
       ])
     : [null, null];
-  const requestedEditRequestId = (await searchParams).editRequestId;
+  const favorites = isGeneralUser ? await findFavorites(session.user.id) : [];
+  const isFavorite = favorites.some((favorite) => favorite.wordId === word._id.toString());
+  const search = await searchParams;
+  const requestedEditRequestId = search.editRequestId;
   const editRequestId =
     session?.user?.role === "admin" && typeof requestedEditRequestId === "string"
       ? requestedEditRequestId
@@ -75,7 +81,9 @@ export default async function WordDetailPage({ params, searchParams }) {
         <Link href="/">← 단어 목록으로</Link>
       </p>
 
+      {isGeneralUser && <RecordView slug={slug} />}
       <article className="word-detail">
+        <WordActions slug={slug} name={word.name} description={word.description} isUser={isGeneralUser} isFavorite={isFavorite} />
         <header>
           <p className="word-category">{word.category}</p>
           <h2>{word.name}</h2>
@@ -126,6 +134,7 @@ export default async function WordDetailPage({ params, searchParams }) {
         {session?.user?.role === "admin" && (
           <AdminWordManagement
             editRequestId={editRequestId}
+            initiallyEditing={search.edit === "true"}
             word={{
               name: word.name,
               meaning: word.meaning,

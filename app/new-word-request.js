@@ -37,7 +37,7 @@ export default function NewWordRequest({ query, userRole }) {
   if (!userRole) {
     return (
       <button type="button" onClick={openLoginDialog}>
-        관리자에게 단어 요청하기
+        단어 등록 요청
       </button>
     );
   }
@@ -54,7 +54,7 @@ export default function NewWordRequest({ query, userRole }) {
     <div className="word-request-form">
       {!isEditing && (
         <button type="button" onClick={() => setIsEditing(true)}>
-          관리자에게 단어 요청하기
+          단어 등록 요청
         </button>
       )}
 
@@ -111,6 +111,7 @@ export default function NewWordRequest({ query, userRole }) {
         </form>
       )}
 
+      {isPending && <p role="status">AI가 초안을 작성하고 있습니다. 완료 후 관리자에게 검토를 요청합니다.</p>}
       {state.message && (
         <p
           className={`status-message ${state.type}`}

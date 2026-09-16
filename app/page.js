@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import NewWordRequest from "./new-word-request";
-import AiWordRequest from "./ai-word-request";
+import WordActions from "@/components/word-actions";
+import { findFavorites } from "@/lib/activity/data";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findWords } from "@/lib/words/data";
 import {
@@ -17,6 +18,9 @@ export default async function Home({ searchParams }) {
     findWords(filters),
     getCurrentSession(),
   ]);
+
+  const favorites = session?.user?.role === "user" ? await findFavorites(session.user.id) : [];
+  const favoriteIds = new Set(favorites.map((favorite) => favorite.wordId));
 
   return (
     <main>
@@ -75,10 +79,6 @@ export default async function Home({ searchParams }) {
             </p>
             {filters.query && (
               <div className="empty-result-actions">
-                <AiWordRequest
-                  query={filters.query}
-                  userRole={session?.user?.role ?? null}
-                />
                 <NewWordRequest
                   query={filters.query}
                   userRole={session?.user?.role ?? null}
@@ -103,6 +103,7 @@ export default async function Home({ searchParams }) {
                       ))}
                     </ul>
                   )}
+                  <WordActions slug={word.slug} name={word.name} description={word.description} isUser={session?.user?.role === "user"} isFavorite={favoriteIds.has(word._id.toString())} />
                 </article>
               </li>
             ))}

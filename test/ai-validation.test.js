@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { validateAiQuizOutput, validateAiWordOutput } from "../lib/ai/validation.js";
+import { validateAiQuizOutput, validateAiWordOutput, validateQuizAnswers } from "../lib/ai/validation.js";
 
 test("AI 단어 출력에서 정의되지 않은 필드를 거절한다", () => {
   const result = validateAiWordOutput({
@@ -18,10 +18,10 @@ test("AI 단어 출력에서 정의되지 않은 필드를 거절한다", () => 
   assert.equal(result.error, "AI_WORD_INVALID");
 });
 
-test("AI 퀴즈 출력은 세 문제와 네 개의 서로 다른 선택지를 요구한다", () => {
+test("AI 퀴즈 출력은 다섯 문제와 네 개의 서로 다른 선택지를 요구한다", () => {
   const result = validateAiQuizOutput(
     {
-      difficulty: "초급",
+      difficulty: "하",
       questions: [
         {
           wordId: "word-1",
@@ -44,12 +44,45 @@ test("AI 퀴즈 출력은 세 문제와 네 개의 서로 다른 선택지를 �
           correctChoiceIndex: 0,
           explanation: "State는 컴포넌트가 기억하는 상태입니다.",
         },
+        ...[4, 5].map((number) => ({
+          wordId: `word-${number}`, question: `문제 ${number}`,
+          choices: ["가", "나", "다", "라"], correctChoiceIndex: 2, explanation: "설명",
+        })),
       ],
     },
-    ["word-1", "word-2", "word-3"],
-    "초급"
+    ["word-1", "word-2", "word-3", "word-4", "word-5"],
+    "하"
   );
 
   assert.equal(result.error, "");
-  assert.equal(result.quiz.questions.length, 3);
+  assert.equal(result.quiz.questions.length, 5);
+});
+
+
+test("미선택 답안과 빈 답안을 0번 선택지로 채점하지 않는다", () => {
+  const form = new FormData();
+  for (let index = 0; index < 4; index++) form.set(`answer-${index}`, "0");
+  assert.ok(validateQuizAnswers(form).error);
+  form.set("answer-4", "");
+  assert.ok(validateQuizAnswers(form).error);
+  form.set("answer-4", "4");
+  assert.ok(validateQuizAnswers(form).error);
+  form.set("answer-4", "3");
+  assert.deepEqual(validateQuizAnswers(form).answers, [0, 0, 0, 0, 3]);
+});
+
+test("5문제 퀴즈의 단어 중복, 허용되지 않은 단어, 공백만 다른 선택지를 거절한다", () => {
+  const ids = ["1", "2", "3", "4", "5"];
+  const makeQuiz = () => ({ difficulty: "상", questions: ids.map((wordId) => ({
+    wordId, question: "질문", choices: ["가", "나", "다", "라"], correctChoiceIndex: 1, explanation: "설명",
+  })) });
+  assert.equal(validateAiQuizOutput(makeQuiz(), ids, "상").error, "");
+  const duplicate = makeQuiz(); duplicate.questions[1].wordId = "1";
+  assert.ok(validateAiQuizOutput(duplicate, ids, "상").error);
+  const unknown = makeQuiz(); unknown.questions[0].wordId = "6";
+  assert.ok(validateAiQuizOutput(unknown, ids, "상").error);
+  const choices = makeQuiz(); choices.questions[0].choices = ["가", " 가 ", "다", "라"];
+  assert.ok(validateAiQuizOutput(choices, ids, "상").error);
+  const short = makeQuiz(); short.questions.pop();
+  assert.ok(validateAiQuizOutput(short, ids, "상").error);
 });

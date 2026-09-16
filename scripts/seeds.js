@@ -677,6 +677,8 @@ function validateSeedData() {
 
 // 중복 데이터 생성을 DB 단계에서도 막을 수 있도록 고유 인덱스를 만듭니다.
 async function createIndexes(database) {
+  await database.collection("favorites").createIndex({ userId: 1, wordId: 1 }, { unique: true, name: "unique_favorite_per_user_and_word" });
+  await database.collection("recentWords").createIndex({ userId: 1 }, { unique: true, name: "unique_recent_words_per_user" });
   // 같은 slug를 사용하는 단어가 두 개 이상 저장되지 않게 합니다.
   await database.collection("words").createIndex(
     { slug: 1 },
@@ -991,6 +993,10 @@ async function runSeed() {
 
     // 데이터를 넣기 전에 중복 방지 인덱스를 먼저 준비합니다.
     await createIndexes(database);
+    if (process.argv.includes("--indexes-only")) {
+      console.log("인덱스 준비 완료. 초기 데이터는 추가하지 않았습니다.");
+      return;
+    }
 
     // 사용자, 단어, 메모 순서로 저장해 메모에 필요한 두 ID를 연결합니다.
     const userIdsByEmail = await seedTestUsers(auth, database);

@@ -1,5 +1,6 @@
 "use server";
 
+import { prepareRequestDraft } from "@/lib/word-requests/draft";
 import { refresh } from "next/cache";
 import { getCurrentSession } from "@/lib/auth/session";
 import {
@@ -91,9 +92,10 @@ export async function submitWordRequest(previousState, formData) {
       );
     }
 
+    await prepareRequestDraft({ requestId: result.requestId, userId: authorization.session.user.id, ...form.validation });
     refresh();
 
-    return actionResult("success", "단어 요청이 등록되었습니다.");
+    return actionResult("success", "등록 요청을 보냈습니다. 관리자 검토 후 공개됩니다.");
   } catch (error) {
     console.error("새 단어 요청 등록 실패:", error);
 
@@ -143,6 +145,7 @@ export async function editWordRequest(requestId, previousState, formData) {
       return actionResult("success", "변경된 요청 내용이 없습니다.");
     }
 
+    await prepareRequestDraft({ requestId, userId: authorization.session.user.id, ...form.validation });
     refresh();
 
     return actionResult("success", "요청 내용이 수정되었습니다.");

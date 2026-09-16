@@ -354,3 +354,28 @@ dialog {
     flex-wrap: wrap;
   }
 }
+
+.word-actions {
+  margin-top: 1rem;
+}
+
+.word-actions form,
+.form-actions form {
+  margin: 0;
+}
+
+.word-actions .form-actions + .form-actions {
+  margin-top: 0.5rem;
+}
+
+.admin-word-form,
+.request-card {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-word-form input,
+.admin-word-form select {
+  width: 100%;
+}

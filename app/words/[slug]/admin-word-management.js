@@ -10,8 +10,8 @@ const initialActionState = {
   submittedAt: 0,
 };
 
-export default function AdminWordManagement({ word, editRequestId }) {
-  const [isEditing, setIsEditing] = useState(Boolean(editRequestId));
+export default function AdminWordManagement({ word, editRequestId, initiallyEditing = false }) {
+  const [isEditing, setIsEditing] = useState(Boolean(editRequestId) || initiallyEditing);
   const updateConfirmationDialogRef = useRef(null);
   const deleteConfirmationDialogRef = useRef(null);
   const updateAction = updateAdminWord.bind(null, word.slug);

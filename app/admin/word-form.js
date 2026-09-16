@@ -12,6 +12,7 @@ const initialActionState = {
 
 export default function AdminWordForm({
   initialName = "",
+  draft = null,
   requestNormalizedWord = "",
   buttonLabel = "새 단어 등록",
 }) {
@@ -56,7 +57,7 @@ export default function AdminWordForm({
           <input
             id={`word-name-${fieldSuffix}`}
             name="name"
-            defaultValue={initialName}
+            defaultValue={draft?.name ?? initialName}
             maxLength={100}
             required
           />
@@ -65,6 +66,7 @@ export default function AdminWordForm({
           <input
             id={`word-meaning-${fieldSuffix}`}
             name="meaning"
+            defaultValue={draft?.meaning ?? ""}
             placeholder="예: branch : 나무의 가지"
             maxLength={300}
             required
@@ -74,6 +76,7 @@ export default function AdminWordForm({
           <input
             id={`word-slug-${fieldSuffix}`}
             name="slug"
+            defaultValue={draft?.slug ?? ""}
             placeholder="예: branch"
             required
           />
@@ -82,13 +85,14 @@ export default function AdminWordForm({
           <textarea
             id={`word-description-${fieldSuffix}`}
             name="description"
+            defaultValue={draft?.description ?? ""}
             rows={5}
             maxLength={1000}
             required
           />
 
           <label htmlFor={`word-category-${fieldSuffix}`}>카테고리</label>
-          <select id={`word-category-${fieldSuffix}`} name="category" required>
+          <select id={`word-category-${fieldSuffix}`} name="category" defaultValue={draft?.category ?? ""} required>
             <option value="">카테고리 선택</option>
             {WORD_CATEGORIES.map((category) => (
               <option key={category} value={category}>
@@ -101,6 +105,7 @@ export default function AdminWordForm({
           <input
             id={`word-tags-${fieldSuffix}`}
             name="tags"
+            defaultValue={draft?.tags?.join(", ") ?? ""}
             placeholder="예: Git, 작업 흐름"
           />
 
@@ -108,13 +113,14 @@ export default function AdminWordForm({
           <textarea
             id={`word-code-${fieldSuffix}`}
             name="codeExample"
+            defaultValue={draft?.codeExample ?? ""}
             rows={7}
             maxLength={5000}
             required
           />
 
           <label htmlFor={`word-language-${fieldSuffix}`}>코드 언어</label>
-          <select id={`word-language-${fieldSuffix}`} name="codeLanguage" required>
+          <select id={`word-language-${fieldSuffix}`} name="codeLanguage" defaultValue={draft?.codeLanguage ?? "javascript"} required>
             {Object.entries(CODE_LANGUAGE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}

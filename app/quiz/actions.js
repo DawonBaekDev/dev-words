@@ -9,7 +9,7 @@ import {
   endAiRun,
 } from "@/lib/ai/data";
 import { generateAiQuiz } from "@/lib/ai/quiz";
-import { QUIZ_DIFFICULTIES } from "@/lib/ai/validation";
+import { QUIZ_DIFFICULTIES, validateQuizAnswers } from "@/lib/ai/validation";
 import { findRandomWords } from "@/lib/words/data";
 
 function actionResult(type, message, extra = {}) {
@@ -69,9 +69,9 @@ export async function generateQuiz(previousState, formData) {
     }
 
     runId = run.runId;
-    const words = await findRandomWords(3);
+    const words = await findRandomWords(5);
 
-    if (words.length !== 3) {
+    if (words.length !== 5) {
       return actionResult("error", "퀴즈를 만들 단어가 부족합니다.");
     }
 
@@ -110,15 +110,12 @@ export async function submitQuiz(previousState, formData) {
     return actionResult("error", "제출할 퀴즈를 찾을 수 없습니다.");
   }
 
-  const answers = [0, 1, 2].map((index) => Number(formData.get(`answer-${index}`)));
-
-  if (answers.some((answer) => !Number.isInteger(answer) || answer < 0 || answer > 3)) {
-    return actionResult("error", "세 문제의 답을 모두 선택해 주세요.");
-  }
+  const { answers, error } = validateQuizAnswers(formData);
+  if (error) return actionResult("error", error);
 
   const quiz = await consumeQuizSession({ quizId, userId: user.id });
 
-  if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length !== 3) {
+  if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length !== 5) {
     return actionResult("error", "퀴즈 시간이 지났거나 이미 제출되었습니다. 새 퀴즈를 시작해 주세요.");
   }
 

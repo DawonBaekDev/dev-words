@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { generateQuiz, submitQuiz } from "./actions";
 import { QUIZ_DIFFICULTIES } from "@/lib/ai/validation";
@@ -36,7 +37,7 @@ export default function QuizClient() {
     return (
       <section aria-labelledby="quiz-result-heading">
         <h2 id="quiz-result-heading">AI 퀴즈 결과</h2>
-        <p><strong>{resultState.score}점 / 3점</strong></p>
+        <p><strong>{resultState.score}점 / 5점</strong></p>
         <ol className="quiz-question-list">
           {resultState.results.map((result, index) => (
             <li key={result.question}>
@@ -50,7 +51,8 @@ export default function QuizClient() {
             </li>
           ))}
         </ol>
-        <button type="button" onClick={() => window.location.reload()}>새 퀴즈 시작</button>
+        <button type="button" onClick={() => window.location.reload()}>재도전</button>
+        <Link href="/mypage">퀴즈 종료</Link>
       </section>
     );
   }
@@ -93,7 +95,7 @@ export default function QuizClient() {
   return (
     <section aria-labelledby="quiz-start-heading">
       <h2 id="quiz-start-heading">AI 퀴즈</h2>
-      <p>난이도를 선택하면 현재 단어장에서 3문제를 만듭니다.</p>
+      <p>난이도를 선택하면 현재 단어장에서 5문제를 만듭니다.</p>
       <form action={quizFormAction}>
         <fieldset>
           <legend>난이도</legend>

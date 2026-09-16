@@ -12,9 +12,9 @@ const initialActionState = {
 };
 
 const STATUS_LABELS = {
-  pending: "처리 중",
-  completed: "완료",
-  rejected: "거절",
+  pending: "검증 대기중",
+  completed: "처리완료",
+  rejected: "등록불가",
 };
 
 export default function WordRequestItem({ request }) {

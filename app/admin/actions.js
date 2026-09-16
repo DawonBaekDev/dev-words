@@ -4,11 +4,13 @@ import { refresh } from "next/cache";
 import { getCurrentSession } from "@/lib/auth/session";
 import {
   completeWordRequestGroup,
+  findPendingRequestGroup,
   rejectWordRequestGroup,
 } from "@/lib/word-requests/data";
 import { rejectWordEditRequest } from "@/lib/word-edit-requests/data";
 import {
   createWord,
+  deleteWordBySlug,
   findWordByExactName,
   findWordBySlug,
 } from "@/lib/words/data";
@@ -71,9 +73,13 @@ export async function createAdminWord(previousState, formData) {
     return actionResult("error", "같은 이름 또는 슬러그의 단어가 이미 있습니다.");
   }
 
+  const normalizedWord = formData.get("requestNormalizedWord");
+  if (typeof normalizedWord === "string" && normalizedWord && !(await findPendingRequestGroup(normalizedWord))) {
+    return actionResult("error", "이미 처리된 요청입니다. 목록을 다시 확인해 주세요.");
+  }
+
   try {
     const wordId = await createWord(validation.word);
-    const normalizedWord = formData.get("requestNormalizedWord");
 
     if (typeof normalizedWord === "string" && normalizedWord) {
       await completeWordRequestGroup({ normalizedWord, wordId });
@@ -153,4 +159,16 @@ export async function rejectAdminWordEditRequest(
 
   refresh();
   return actionResult("success", "요청이 거절되었습니다.");
+}
+
+export async function deleteRegisteredWord(slug) {
+  if (!(await requireAdmin())) return actionResult("error", "관리자만 이용할 수 있는 기능입니다.");
+  if (!(await findWordBySlug(slug))) return actionResult("error", "삭제할 단어를 찾을 수 없습니다.");
+  try {
+    await deleteWordBySlug(slug);
+    refresh();
+    return actionResult("success", "단어가 삭제되었습니다.");
+  } catch {
+    return actionResult("error", "단어를 삭제하지 못했습니다.");
+  }
 }

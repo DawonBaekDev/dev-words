@@ -100,6 +100,10 @@ export async function updateAdminWord(slug, previousState, formData) {
     redirect("/admin");
   }
 
+  if (validation.word.slug !== slug) {
+    redirect(`/words/${validation.word.slug}`);
+  }
+
   refresh();
   return actionResult("success", "단어가 수정되었습니다.");
 }

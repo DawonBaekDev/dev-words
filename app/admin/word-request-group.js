@@ -23,7 +23,7 @@ export default function AdminWordRequestGroup({ group }) {
     <article className="request-card">
       <div className="request-heading">
         <h3>{group.requestedWord}</h3>
-        <span className="request-status pending">처리 중</span>
+        <span className="request-status pending">검증 대기중</span>
       </div>
       <p>
         <strong>요청 인원:</strong> {group.requestCount}명
@@ -39,25 +39,36 @@ export default function AdminWordRequestGroup({ group }) {
         </div>
       </dl>
 
+      <p role="status">{group.message}</p>
+      {group.draft && <section aria-label="AI 단어 초안">
+        <h4>{group.draft.name}</h4>
+        <p>{group.draft.meaning}</p>
+        <p>{group.draft.description}</p>
+        <p>{group.draft.category} · {group.draft.tags.join(", ")}</p>
+        <p>{group.draft.codeLanguage}</p>
+        <pre><code>{group.draft.codeExample}</code></pre>
+      </section>}
       <div className="form-actions">
         <AdminWordForm
           initialName={group.requestedWord}
+          draft={group.draft}
           requestNormalizedWord={group.normalizedWord}
-          buttonLabel="단어 등록하기"
+          buttonLabel={group.draft ? "초안 검토·승인" : "직접 작성·등록"}
         />
         {!isRejecting && (
           <button type="button" onClick={() => setIsRejecting(true)}>
-            요청 거절하기
+            등록불가 처리
           </button>
         )}
       </div>
 
       {isRejecting && (
         <form action={formAction}>
-          <label htmlFor={`reason-${group.normalizedWord}`}>거절 사유</label>
+          <label htmlFor={`reason-${group.normalizedWord}`}>등록불가 사유</label>
           <textarea
             id={`reason-${group.normalizedWord}`}
             name="reason"
+            placeholder="현재 등록 중인 단어입니다."
             rows={4}
             maxLength={1000}
             required

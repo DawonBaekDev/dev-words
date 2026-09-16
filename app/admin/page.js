@@ -4,10 +4,11 @@ import { connection } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
 import AdminEditRequestItem from "./edit-request-item";
 import AdminWordRequestGroup from "./word-request-group";
+import DeleteWord from "./delete-word";
 import AdminWordForm from "./word-form";
 import { findPendingWordEditRequests } from "@/lib/word-edit-requests/data";
-import { findPendingWordRequestGroups } from "@/lib/word-requests/data";
-import { findWordsByIds } from "@/lib/words/data";
+import { findRequestGroups } from "@/lib/word-requests/data";
+import { findWordsByIds, findWords } from "@/lib/words/data";
 
 export const metadata = {
   title: "관리자 페이지",
@@ -34,10 +35,13 @@ export default async function AdminPage() {
     redirect("/mypage");
   }
 
-  const [requestGroups, editRequests] = await Promise.all([
-    findPendingWordRequestGroups(),
+  const [allGroups, editRequests, words] = await Promise.all([
+    findRequestGroups(),
     findPendingWordEditRequests(),
+    findWords({}),
   ]);
+  const requestGroups = allGroups.filter((group) => group.status === "pending");
+  const previousGroups = allGroups.filter((group) => group.status !== "pending");
   const editedWords = await findWordsByIds(
     editRequests.map((request) => request.wordId)
   );
@@ -58,21 +62,23 @@ export default async function AdminPage() {
       <section aria-labelledby="admin-heading">
         <h2 id="admin-heading">관리자 페이지</h2>
         <p>사용자가 요청한 새 단어 알림을 최신 요청부터 확인하세요.</p>
-        <AdminWordForm />
+
       </section>
 
       <details open className="request-accordion">
-        <summary>새 단어 요청 {pendingRequestCount}건</summary>
+        <summary>신규 등록 요청 · 검증 대기중 {pendingRequestCount}건</summary>
 
         {requestGroups.length === 0 ? (
           <p>현재 확인할 새 단어 요청이 없습니다.</p>
         ) : (
           <ul className="request-list admin-request-list">
             {requestGroups.map((group) => (
-              <li key={group._id}>
+              <li key={group.normalizedWord}>
                 <AdminWordRequestGroup
                   group={{
-                    normalizedWord: group._id,
+                    normalizedWord: group.normalizedWord,
+                    draft: group.requests.find((request) => request.draft)?.draft ?? null,
+                    message: group.requests.some((request) => request.draft) ? "해당 카드를 등록할까요?" : "자동생성 실패. 관리자 확인요망",
                     requestedWord: group.requestedWord,
                     requestCount: group.requestCount,
                     firstRequestedAt: formatDateTime(group.firstRequestedAt),
@@ -83,6 +89,38 @@ export default async function AdminPage() {
             ))}
           </ul>
         )}
+      </details>
+
+      <details className="request-accordion">
+        <summary>이전 등록 요청 내역</summary>
+        {previousGroups.length === 0 ? <p>처리된 요청이 없습니다.</p> : <ul className="request-list">
+          {previousGroups.map((group) => <li key={`${group.normalizedWord}-${group.status}`}>
+            <article className="request-card">
+              <h3>{group.requestedWord}</h3>
+              <p>{group.status === "completed" ? "처리완료" : "등록불가"} · {group.requestCount}건</p>
+              {group.requests.map((request) => <p key={request._id.toString()}>
+                {formatDateTime(request.updatedAt)}{request.rejectionReason && ` · ${request.rejectionReason}`}
+              </p>)}
+            </article>
+          </li>)}
+        </ul>}
+      </details>
+
+      <details className="request-accordion">
+        <summary>등록된 단어 관리 · {words.length}개</summary>
+        <AdminWordForm />
+        <ul className="request-list">
+          {words.map((word) => <li key={word._id.toString()}>
+            <article className="request-card">
+              <h3><Link href={`/words/${word.slug}`}>{word.name}</Link></h3>
+              <p>{word.description}</p>
+              <div className="form-actions">
+                <Link href={`/words/${word.slug}?edit=true`}>수정</Link>
+                <DeleteWord slug={word.slug} />
+              </div>
+            </article>
+          </li>)}
+        </ul>
       </details>
 
       <details open className="request-accordion">

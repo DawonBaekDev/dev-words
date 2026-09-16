@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { saveMemo } from "./actions";
+import { saveMemo, deleteMemo } from "./actions";
 
 const initialActionState = {
   type: "idle",
@@ -67,6 +67,12 @@ export default function MemoSection({ slug, memo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const [deleteState, deleteAction, isDeleting] = useActionState(async () => {
+    const result = await deleteMemo(slug);
+    if (result.type === "success") finishEditing(result.message);
+    return result;
+  }, initialActionState);
+
   function startEditing() {
     setSuccessMessage("");
     setIsEditing(true);
@@ -97,6 +103,12 @@ export default function MemoSection({ slug, memo }) {
           <button type="button" onClick={startEditing}>
             수정
           </button>
+          <form action={deleteAction} onSubmit={(event) => {
+            if (!window.confirm("메모를 삭제하시겠습니까? 삭제 이력은 보관됩니다.")) event.preventDefault();
+          }}>
+            <button type="submit" disabled={isDeleting}>{isDeleting ? "삭제 중..." : "메모 삭제"}</button>
+          </form>
+          {deleteState.type === "error" && <p role="alert">{deleteState.message}</p>}
         </div>
       )}
 
