@@ -739,7 +739,7 @@ Codex 출력에는 정확히 3개의 문제가 있어야 하며 각 `wordId`는 
 | --- | --- |
 | 운영체제 | Windows 11 |
 | Codex CLI | 호스트 OS에 설치됨 |
-| 확인된 버전 | `codex-cli 0.154.0-alpha.6.2` (Windows 실제 실행 파일) |
+| 확인된 버전 | `codex-cli 0.147.0` (npm 전역 `codex` 명령) |
 | 인증 상태 | ChatGPT 계정으로 로그인됨 |
 
 버전 번호는 2026년 9월 16일 확인 당시의 값이며, 서비스 로직이 특정 패치 버전에 의존하지 않게 구현합니다. 다음 명령으로 호스트 상태를 확인할 수 있습니다.
@@ -759,9 +759,9 @@ codex login status
 
 애플리케이션이 Codex 로그인을 자동으로 수행하지는 않습니다. CLI가 없거나 로그인 상태가 유효하지 않으면 AI 기능만 사용할 수 없는 상태로 처리하고 일반 단어 검색, 메모, 관리자 기능은 계속 사용할 수 있게 합니다.
 
-Windows의 npm 전역 설치에서는 `codex.cmd`, `codex.ps1`, `codex.exe` 중 하나가 PATH에서 발견될 수 있습니다. 서버는 `where.exe codex`로 PATH를 조회해 실제 `codex.exe`를 우선 실행합니다. 실제 실행 파일을 찾지 못하면 서버 전용 환경 변수 `CODEX_CLI_PATH`에 신뢰할 수 있는 실행 파일 절대 경로를 지정합니다. Linux에서는 기본적으로 `codex` 명령을 사용합니다.
+Windows의 npm 전역 설치에서는 보통 PATH에서 확장자 없는 shim과 `codex.cmd`가 발견됩니다. 서버는 `where.exe codex` 결과를 순서대로 확인합니다. `codex.cmd`이면 같은 npm 전역 폴더의 `@openai/codex/bin/codex.js`를 현재 Node.js로 실행하고, 실제 `codex.exe`이면 그대로 실행합니다. 둘 다 찾지 못하면 서버 전용 환경 변수 `CODEX_CLI_PATH`에 신뢰할 수 있는 실행 파일 절대 경로를 지정합니다. Linux에서는 기본적으로 `codex` 명령을 사용합니다.
 
-Node.js에서는 `codex.exe` 또는 Linux의 `codex` 실행 파일을 `shell: false`로 직접 실행합니다. 사용자 입력은 명령 인자가 아닌 stdin으로 전달합니다.
+Node.js에서는 Windows npm의 Codex 진입점, `codex.exe`, 또는 Linux의 `codex` 실행 파일을 `shell: false`로 실행합니다. 사용자 입력은 명령 인자가 아닌 stdin으로 전달합니다.
 
 ### 17.5 서버 실행 구조
 
@@ -843,7 +843,8 @@ AI 퀴즈도 문제 수가 3개인지, 각 단어가 현재 존재하는지, 정
 
 | 상황 | 사용자 메시지와 처리 |
 | --- | --- |
-| Codex CLI 없음 | AI 기능을 현재 사용할 수 없습니다. 일반 기능은 계속 제공 |
+| Codex CLI 없음 | 서버에서 Codex CLI를 찾지 못했습니다. 설치 경로를 확인해 주세요. |
+| Codex CLI 비정상 종료 | Codex CLI 실행에 실패했습니다. 잠시 후 다시 시도해 주세요. |
 | Codex 로그인 만료 | AI 기능을 현재 사용할 수 없습니다. 서버 로그에 재로그인 필요 기록 |
 | 실행 시간 초과 | AI 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요. |
 | 잘못된 JSON 또는 검증 실패 | AI가 올바른 정보를 만들지 못했습니다. 다시 시도해 주세요. |

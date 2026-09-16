@@ -17,6 +17,14 @@ function actionResult(type, message, extra = {}) {
 }
 
 function aiQuizErrorMessage(error) {
+  if (error?.message === "AI_CLI_UNAVAILABLE") {
+    return "서버에서 Codex CLI를 찾지 못했습니다. 설치 경로를 확인해 주세요.";
+  }
+
+  if (error?.message === "AI_CLI_FAILED") {
+    return "Codex CLI 실행에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+  }
+
   if (error?.message === "AI_TIMEOUT") {
     return "AI 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.";
   }
