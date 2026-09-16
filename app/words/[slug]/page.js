@@ -16,6 +16,22 @@ function formatDateTime(date) {
   }).format(date);
 }
 
+function WordMeaning({ meaning }) {
+  if (typeof meaning !== "string" || !meaning.trim()) {
+    return null;
+  }
+
+  const [englishWord, ...koreanMeaningParts] = meaning.split(" : ");
+  const koreanMeaning = koreanMeaningParts.join(" : ");
+
+  return (
+    <p className="word-meaning">
+      <strong>{englishWord}</strong>
+      {koreanMeaning && ` : ${koreanMeaning}`}
+    </p>
+  );
+}
+
 export default async function WordDetailPage({ params }) {
   await connection();
 
@@ -52,6 +68,7 @@ export default async function WordDetailPage({ params }) {
         <header>
           <p className="word-category">{word.category}</p>
           <h2>{word.name}</h2>
+          <WordMeaning meaning={word.meaning} />
           {word.tags.length > 0 && (
             <ul className="tag-list" aria-label={`${word.name} 태그`}>
               {word.tags.map((tag) => (

@@ -19,10 +19,25 @@ const categories = [
 // 코드 예시에서 사용할 언어 식별자를 한곳에 정의합니다.
 const codeLanguages = ["javascript", "jsx", "bash", "text"];
 
+// 직역 의미가 "영어 원어 : 한국어 뜻" 형식인지 확인합니다.
+function isValidMeaning(meaning) {
+  if (typeof meaning !== "string") {
+    return false;
+  }
+
+  const meaningParts = meaning.split(" : ");
+
+  return (
+    meaningParts.length === 2 &&
+    meaningParts.every((meaningPart) => meaningPart.trim().length > 0)
+  );
+}
+
 // 카테고리마다 5개씩 저장할 총 30개의 초기 단어를 정의합니다.
 const seedWords = [
   {
     name: "HTTP",
+    meaning: "Hypertext Transfer Protocol : 하이퍼텍스트 전송 규약",
     slug: "http",
     description:
       "웹에서 브라우저와 서버가 요청과 응답을 주고받을 때 사용하는 통신 규칙입니다.",
@@ -36,6 +51,7 @@ console.log(words);`,
   },
   {
     name: "URL",
+    meaning: "Uniform Resource Locator : 통합 자원 위치 지정자",
     slug: "url",
     description:
       "웹페이지나 이미지처럼 인터넷에 있는 자원의 위치를 나타내는 주소입니다.",
@@ -49,6 +65,7 @@ console.log(url.searchParams.get("category"));`,
   },
   {
     name: "브라우저",
+    meaning: "browser : 둘러보는 사람이나 도구",
     slug: "browser",
     description:
       "웹페이지를 불러와 화면에 표시하고 사용자가 페이지와 상호작용할 수 있게 하는 프로그램입니다.",
@@ -61,6 +78,7 @@ title.textContent = "개발자 단어장";`,
   },
   {
     name: "클라이언트",
+    meaning: "client : 의뢰인, 고객",
     slug: "client",
     description:
       "서버에 데이터나 작업을 요청하고 서버가 보내 준 결과를 사용하는 프로그램입니다. 웹 브라우저가 대표적인 예입니다.",
@@ -74,6 +92,7 @@ console.log(word.name);`,
   },
   {
     name: "서버",
+    meaning: "server : 제공하는 사람이나 장치",
     slug: "server",
     description:
       "클라이언트의 요청을 받아 필요한 작업을 처리하고 결과를 보내 주는 프로그램이나 컴퓨터입니다.",
@@ -88,6 +107,7 @@ createServer((request, response) => {
   },
   {
     name: "컴포넌트",
+    meaning: "component : 구성 요소",
     slug: "component",
     description:
       "버튼이나 검색창처럼 화면의 일부를 구성하는 코드 단위입니다. 같은 컴포넌트를 여러 곳에서 재사용할 수 있습니다.",
@@ -100,6 +120,7 @@ createServer((request, response) => {
   },
   {
     name: "Props",
+    meaning: "properties : 속성들",
     slug: "props",
     description:
       "부모 컴포넌트가 자식 컴포넌트에 전달하는 데이터입니다. 전달받은 컴포넌트는 Props를 직접 수정하지 않고 사용합니다.",
@@ -116,6 +137,7 @@ export default function Page() {
   },
   {
     name: "State",
+    meaning: "state : 상태",
     slug: "state",
     description:
       "컴포넌트가 기억하는 데이터입니다. 입력창의 내용이나 버튼을 누른 횟수처럼 바뀌는 값을 관리할 때 사용합니다.",
@@ -132,6 +154,7 @@ export default function Counter() {
   },
   {
     name: "useState",
+    meaning: "use state : 상태를 사용하다",
     slug: "use-state",
     description:
       "함수형 컴포넌트에서 State를 만들고 그 값을 변경할 수 있게 해 주는 Hook입니다.",
@@ -153,6 +176,7 @@ export default function SearchInput() {
   },
   {
     name: "JSX",
+    meaning: "JavaScript XML : 자바스크립트 XML",
     slug: "jsx",
     description:
       "JavaScript 코드 안에서 HTML과 비슷한 문법으로 화면 구조를 표현하는 문법입니다.",
@@ -167,6 +191,7 @@ export default function Word() {
   },
   {
     name: "데이터베이스",
+    meaning: "database : 데이터 저장소",
     slug: "database",
     description:
       "여러 데이터를 저장하고 필요한 데이터를 찾거나 변경할 수 있도록 관리하는 시스템입니다.",
@@ -182,6 +207,7 @@ const database = client.db("dev-words");`,
   },
   {
     name: "MongoDB",
+    meaning: "MongoDB : Mongo라는 이름의 데이터베이스",
     slug: "mongodb",
     description:
       "데이터를 문서 형태로 저장하는 데이터베이스입니다. 단어의 이름, 설명, 태그 등을 하나의 문서로 묶어 저장할 수 있습니다.",
@@ -195,6 +221,7 @@ console.log(await words.countDocuments());`,
   },
   {
     name: "컬렉션",
+    meaning: "collection : 모음",
     slug: "collection",
     description:
       "MongoDB에서 관련된 문서들을 모아 두는 공간입니다. 예를 들어 여러 단어 문서를 하나의 컬렉션에 저장할 수 있습니다.",
@@ -208,6 +235,7 @@ console.log(words);`,
   },
   {
     name: "문서",
+    meaning: "document : 문서, 기록",
     slug: "document",
     description:
       "MongoDB에 저장되는 데이터 한 건입니다. 여러 필드와 값으로 구성되며 단어 하나의 정보를 담을 수 있습니다.",
@@ -222,6 +250,7 @@ console.log(words);`,
   },
   {
     name: "쿼리",
+    meaning: "query : 질문, 문의",
     slug: "query",
     description:
       "데이터베이스에 원하는 데이터를 찾거나 처리하도록 요청하는 명령입니다. 특정 카테고리의 단어를 찾는 요청이 한 예입니다.",
@@ -235,6 +264,7 @@ console.log(words);`,
   },
   {
     name: "App Router",
+    meaning: "app router : 애플리케이션의 경로 안내자",
     slug: "app-router",
     description:
       "Next.js의 app 폴더 구조를 이용해 페이지 주소와 공통 화면 구조를 구성하는 라우팅 방식입니다.",
@@ -250,6 +280,7 @@ console.log(words);`,
   },
   {
     name: "Layout",
+    meaning: "layout : 배치, 화면 구성",
     slug: "layout",
     description:
       "여러 페이지가 함께 사용하는 화면 구조입니다. 공통 메뉴나 페이지를 감싸는 틀을 구성할 때 사용합니다.",
@@ -266,6 +297,7 @@ console.log(words);`,
   },
   {
     name: "동적 라우팅",
+    meaning: "dynamic routing : 동적으로 경로를 정하는 것",
     slug: "dynamic-routing",
     description:
       "주소의 일부를 변수처럼 사용해 서로 다른 내용을 보여주는 방식입니다. 단어 슬러그에 따라 해당 단어의 상세 화면을 보여줄 수 있습니다.",
@@ -280,6 +312,7 @@ console.log(words);`,
   },
   {
     name: "서버 컴포넌트",
+    meaning: "server component : 서버 구성 요소",
     slug: "server-component",
     description:
       "서버에서 실행되는 React 컴포넌트입니다. 데이터베이스에서 데이터를 가져오고 화면을 구성할 수 있습니다.",
@@ -296,6 +329,7 @@ export default async function WordListPage() {
   },
   {
     name: "Server Action",
+    meaning: "server action : 서버에서 하는 동작",
     slug: "server-action",
     description:
       "폼 제출이나 버튼 동작에서 호출하여 서버에서 실행하는 비동기 함수입니다. 데이터를 등록하거나 수정하는 작업에 사용할 수 있습니다.",
@@ -312,6 +346,7 @@ export async function saveWord(formData) {
   },
   {
     name: "변수",
+    meaning: "variable : 변할 수 있는 것",
     slug: "variable",
     description:
       "값을 저장하고 이름을 붙여 다시 사용할 수 있게 하는 방법입니다. 사용자 이름이나 검색어 같은 값을 다룰 때 사용합니다.",
@@ -324,6 +359,7 @@ console.log(searchKeyword);`,
   },
   {
     name: "함수",
+    meaning: "function : 기능, 작용",
     slug: "function",
     description:
       "특정 작업을 수행하는 코드를 묶어 두고 필요할 때 호출하는 단위입니다. 값을 전달받고 처리 결과를 반환할 수 있습니다.",
@@ -338,6 +374,7 @@ console.log(describeWord("HTTP"));`,
   },
   {
     name: "배열",
+    meaning: "array : 가지런히 늘어선 배열",
     slug: "array",
     description:
       "여러 값을 순서대로 담는 자료형입니다. 여러 단어의 목록이나 한 단어의 태그를 저장할 때 사용할 수 있습니다.",
@@ -350,6 +387,7 @@ console.log(tags[0]);`,
   },
   {
     name: "객체",
+    meaning: "object : 대상, 물체",
     slug: "object",
     description:
       "관련된 데이터를 속성 이름과 값의 쌍으로 묶는 자료형입니다. 단어 하나의 이름, 설명, 카테고리를 함께 표현할 수 있습니다.",
@@ -366,6 +404,7 @@ console.log(word.name);`,
   },
   {
     name: "Promise",
+    meaning: "promise : 약속",
     slug: "promise",
     description:
       "비동기 작업의 성공 결과나 실패 이유를 다루는 객체입니다. 서버 요청처럼 결과가 나중에 준비되는 상황에 사용합니다.",
@@ -381,6 +420,7 @@ const words = await loadWords();`,
   },
   {
     name: "Git",
+    meaning: "Git : 버전 관리 도구의 고유 이름",
     slug: "git",
     description:
       "파일의 변경 이력을 기록하고 관리하는 버전 관리 도구입니다. 이전 변경을 확인하거나 여러 사람이 함께 개발할 때 사용합니다.",
@@ -392,6 +432,7 @@ git log --oneline`,
   },
   {
     name: "커밋",
+    meaning: "commit : 맡기다, 확정하다",
     slug: "commit",
     description:
       "Git에서 선택한 파일의 변경 내용을 하나의 기록으로 남기는 작업입니다. 어떤 변경인지 설명하는 메시지를 함께 작성합니다.",
@@ -403,6 +444,7 @@ git commit -m "단어 설명 추가"`,
   },
   {
     name: "브랜치",
+    meaning: "branch : 나무의 가지",
     slug: "branch",
     description:
       "Git에서 다른 작업과 구분해 변경을 쌓아 갈 수 있는 개발 흐름입니다. 새 기능을 별도로 개발할 때 사용할 수 있습니다.",
@@ -414,6 +456,7 @@ git branch`,
   },
   {
     name: "디버깅",
+    meaning: "debugging : 벌레를 제거하는 것",
     slug: "debugging",
     description:
       "프로그램이 예상과 다르게 동작하는 원인을 찾고 수정하는 과정입니다. 오류 메시지나 변수 값을 확인하며 문제를 좁혀 갑니다.",
@@ -426,6 +469,7 @@ console.log("선택한 카테고리:", selectedCategory);`,
   },
   {
     name: "리팩터링",
+    meaning: "refactoring : 구성 요소를 다시 정리하는 것",
     slug: "refactoring",
     description:
       "프로그램의 외부 동작을 유지하면서 내부 코드 구조를 개선하는 작업입니다. 읽기 쉽고 수정하기 편한 코드로 정리하는 것이 목적입니다.",
@@ -517,12 +561,18 @@ function validateSeedData() {
     }
   }
 
-  // 각 단어의 필수값, 분류, 주소, 코드 예시가 올바른지 확인합니다.
+  // 각 단어의 필수값, 직역 의미, 분류, 주소, 코드 예시가 올바른지 확인합니다.
   const slugs = new Set();
 
   for (const word of seedWords) {
     if (!word.name.trim() || !word.description.trim()) {
       throw new Error("모든 단어에는 이름과 설명이 필요합니다.");
+    }
+
+    if (!isValidMeaning(word.meaning)) {
+      throw new Error(
+        `${word.name}의 meaning은 "영어 원어 : 한국어 뜻" 형식이어야 합니다.`
+      );
     }
 
     if (!categories.includes(word.category)) {
@@ -715,7 +765,7 @@ async function seedTestUsers(auth, database) {
   return userIdsByEmail;
 }
 
-// slug로 기존 단어를 확인하고, 새 단어 또는 빠진 코드 예시를 저장합니다.
+// slug로 기존 단어를 확인하고, 새 단어 또는 빠진 필수 필드를 저장합니다.
 async function seedDictionaryWords(database) {
   const wordCollection = database.collection("words");
   const wordIdsBySlug = new Map();
@@ -729,32 +779,38 @@ async function seedDictionaryWords(database) {
     if (existingWord) {
       wordIdsBySlug.set(seedWord.slug, existingWord._id.toString());
 
-      // 기존 단어에서 빠진 코드 필드만 채워 사용자가 수정한 다른 값은 보존합니다.
-      const missingCodeFields = {};
+      // 기존 단어에서 빠진 직역 의미와 코드 필드만 채워 다른 값은 보존합니다.
+      const missingWordFields = {};
+
+      if (!isValidMeaning(existingWord.meaning)) {
+        missingWordFields.meaning = seedWord.meaning;
+      }
 
       if (
         typeof existingWord.codeExample !== "string" ||
         !existingWord.codeExample.trim()
       ) {
-        missingCodeFields.codeExample = seedWord.codeExample;
+        missingWordFields.codeExample = seedWord.codeExample;
       }
 
       if (!codeLanguages.includes(existingWord.codeLanguage)) {
-        missingCodeFields.codeLanguage = seedWord.codeLanguage;
+        missingWordFields.codeLanguage = seedWord.codeLanguage;
       }
 
-      if (Object.keys(missingCodeFields).length > 0) {
+      if (Object.keys(missingWordFields).length > 0) {
         await wordCollection.updateOne(
           { _id: existingWord._id },
           {
             $set: {
-              ...missingCodeFields,
+              ...missingWordFields,
               updatedAt: new Date(),
             },
           }
         );
 
-        console.log(`[보충] 단어 코드 예시: ${seedWord.name}`);
+        console.log(
+          `[보충] 단어 필드: ${seedWord.name} (${Object.keys(missingWordFields).join(", ")})`
+        );
         continue;
       }
 
@@ -833,6 +889,7 @@ function printDryRunResult() {
 
   console.log(`테스트 사용자: ${seedUsers.length}명`);
   console.log(`개인 메모: ${seedMemos.length}개`);
+  console.log("직역 의미: 모든 단어에 포함");
   console.log(`코드 언어: ${codeLanguages.join(", ")}`);
   console.log("--dry-run에서는 MongoDB 데이터를 변경하지 않았습니다.");
 }

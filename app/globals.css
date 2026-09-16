@@ -163,6 +163,11 @@ dialog {
   text-align: left;
 }
 
+.word-meaning {
+  color: var(--text-light);
+  font-size: 1.05rem;
+}
+
 .word-detail pre {
   margin-bottom: 0;
 }
