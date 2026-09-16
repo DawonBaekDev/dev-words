@@ -83,7 +83,7 @@ export default async function WordDetailPage({ params, searchParams }) {
 
       {isGeneralUser && <RecordView slug={slug} />}
       <article className="word-detail">
-        <WordActions slug={slug} name={word.name} description={word.description} isUser={isGeneralUser} isFavorite={isFavorite} />
+        <WordActions showShare slug={slug} name={word.name} description={word.description} isUser={isGeneralUser} isFavorite={isFavorite} />
         <header>
           <p className="word-category">{word.category}</p>
           <h2>{word.name}</h2>

@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import Script from "next/script";
 import { changeFavorite } from "@/app/activity-actions";
 
-export default function WordActions({ slug, name, description, isUser = false, isFavorite = false }) {
+export default function WordActions({ slug, name, description, isUser = false, isFavorite = false, showShare = false }) {
   const [isSharing, setIsSharing] = useState(false);
   const [message, setMessage] = useState("");
   const [kakaoReady, setKakaoReady] = useState(false);
@@ -43,14 +44,18 @@ export default function WordActions({ slug, name, description, isUser = false, i
   return (
     <div className="word-actions">
       <div className="form-actions">
-        <button type="button" aria-expanded={isSharing} onClick={() => setIsSharing(!isSharing)}>공유</button>
+        {showShare ? (
+          <button type="button" aria-expanded={isSharing} onClick={() => setIsSharing(!isSharing)}>공유</button>
+        ) : (
+          <Link className="button" href={`/words/${slug}`}>자세히보기</Link>
+        )}
         {isUser && <form action={favoriteAction}>
           <button type="submit" aria-pressed={isFavorite} disabled={isPending}>
             {isFavorite ? "★ 스크랩 해제" : "☆ 즐겨찾기"}
           </button>
         </form>}
       </div>
-      {isSharing && <div className="form-actions">
+      {showShare && isSharing && <div className="form-actions">
         <button type="button" onClick={copyLink}>링크 복사</button>
         <button type="button" onClick={shareKakao} disabled={!kakaoEnabled || !kakaoReady}>카카오톡으로 공유하기</button>
         {!kakaoEnabled && <small>카카오톡 공유는 준비 중입니다.</small>}
