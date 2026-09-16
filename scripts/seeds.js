@@ -16,6 +16,9 @@ const categories = [
   "기타",
 ];
 
+// 코드 예시에서 사용할 언어 식별자를 한곳에 정의합니다.
+const codeLanguages = ["javascript", "jsx", "bash", "text"];
+
 // 카테고리마다 5개씩 저장할 총 30개의 초기 단어를 정의합니다.
 const seedWords = [
   {
@@ -25,6 +28,11 @@ const seedWords = [
       "웹에서 브라우저와 서버가 요청과 응답을 주고받을 때 사용하는 통신 규칙입니다.",
     category: "웹 기초",
     tags: ["통신", "요청과 응답"],
+    codeExample: `const response = await fetch("/api/words");
+const words = await response.json();
+
+console.log(words);`,
+    codeLanguage: "javascript",
   },
   {
     name: "URL",
@@ -33,6 +41,11 @@ const seedWords = [
       "웹페이지나 이미지처럼 인터넷에 있는 자원의 위치를 나타내는 주소입니다.",
     category: "웹 기초",
     tags: ["주소"],
+    codeExample: `const url = new URL("https://example.com/words?category=React");
+
+console.log(url.pathname);
+console.log(url.searchParams.get("category"));`,
+    codeLanguage: "javascript",
   },
   {
     name: "브라우저",
@@ -41,6 +54,10 @@ const seedWords = [
       "웹페이지를 불러와 화면에 표시하고 사용자가 페이지와 상호작용할 수 있게 하는 프로그램입니다.",
     category: "웹 기초",
     tags: ["클라이언트"],
+    codeExample: `const title = document.querySelector("h1");
+
+title.textContent = "개발자 단어장";`,
+    codeLanguage: "javascript",
   },
   {
     name: "클라이언트",
@@ -49,6 +66,11 @@ const seedWords = [
       "서버에 데이터나 작업을 요청하고 서버가 보내 준 결과를 사용하는 프로그램입니다. 웹 브라우저가 대표적인 예입니다.",
     category: "웹 기초",
     tags: ["요청"],
+    codeExample: `const response = await fetch("/api/words/http");
+const word = await response.json();
+
+console.log(word.name);`,
+    codeLanguage: "javascript",
   },
   {
     name: "서버",
@@ -57,6 +79,12 @@ const seedWords = [
       "클라이언트의 요청을 받아 필요한 작업을 처리하고 결과를 보내 주는 프로그램이나 컴퓨터입니다.",
     category: "웹 기초",
     tags: ["응답"],
+    codeExample: `import { createServer } from "node:http";
+
+createServer((request, response) => {
+  response.end("Hello from the server");
+}).listen(3000);`,
+    codeLanguage: "javascript",
   },
   {
     name: "컴포넌트",
@@ -65,6 +93,10 @@ const seedWords = [
       "버튼이나 검색창처럼 화면의 일부를 구성하는 코드 단위입니다. 같은 컴포넌트를 여러 곳에서 재사용할 수 있습니다.",
     category: "React",
     tags: ["UI", "재사용"],
+    codeExample: `export default function WordTitle() {
+  return <h2>HTTP</h2>;
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "Props",
@@ -73,6 +105,14 @@ const seedWords = [
       "부모 컴포넌트가 자식 컴포넌트에 전달하는 데이터입니다. 전달받은 컴포넌트는 Props를 직접 수정하지 않고 사용합니다.",
     category: "React",
     tags: ["데이터 전달"],
+    codeExample: `function WordTitle({ name }) {
+  return <h2>{name}</h2>;
+}
+
+export default function Page() {
+  return <WordTitle name="HTTP" />;
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "State",
@@ -81,6 +121,14 @@ const seedWords = [
       "컴포넌트가 기억하는 데이터입니다. 입력창의 내용이나 버튼을 누른 횟수처럼 바뀌는 값을 관리할 때 사용합니다.",
     category: "React",
     tags: ["상태 관리"],
+    codeExample: `import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "useState",
@@ -89,6 +137,19 @@ const seedWords = [
       "함수형 컴포넌트에서 State를 만들고 그 값을 변경할 수 있게 해 주는 Hook입니다.",
     category: "React",
     tags: ["Hook", "상태 관리"],
+    codeExample: `import { useState } from "react";
+
+export default function SearchInput() {
+  const [keyword, setKeyword] = useState("");
+
+  return (
+    <input
+      value={keyword}
+      onChange={(event) => setKeyword(event.target.value)}
+    />
+  );
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "JSX",
@@ -97,6 +158,12 @@ const seedWords = [
       "JavaScript 코드 안에서 HTML과 비슷한 문법으로 화면 구조를 표현하는 문법입니다.",
     category: "React",
     tags: ["화면 작성"],
+    codeExample: `const wordName = "HTTP";
+
+export default function Word() {
+  return <strong>{wordName}</strong>;
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "데이터베이스",
@@ -105,6 +172,13 @@ const seedWords = [
       "여러 데이터를 저장하고 필요한 데이터를 찾거나 변경할 수 있도록 관리하는 시스템입니다.",
     category: "데이터",
     tags: ["저장"],
+    codeExample: `import { MongoClient } from "mongodb";
+
+const client = new MongoClient(process.env.MONGODB_URI);
+await client.connect();
+
+const database = client.db("dev-words");`,
+    codeLanguage: "javascript",
   },
   {
     name: "MongoDB",
@@ -113,6 +187,11 @@ const seedWords = [
       "데이터를 문서 형태로 저장하는 데이터베이스입니다. 단어의 이름, 설명, 태그 등을 하나의 문서로 묶어 저장할 수 있습니다.",
     category: "데이터",
     tags: ["NoSQL", "문서"],
+    codeExample: `const database = client.db("dev-words");
+const words = database.collection("words");
+
+console.log(await words.countDocuments());`,
+    codeLanguage: "javascript",
   },
   {
     name: "컬렉션",
@@ -121,6 +200,11 @@ const seedWords = [
       "MongoDB에서 관련된 문서들을 모아 두는 공간입니다. 예를 들어 여러 단어 문서를 하나의 컬렉션에 저장할 수 있습니다.",
     category: "데이터",
     tags: ["MongoDB"],
+    codeExample: `const wordCollection = database.collection("words");
+const words = await wordCollection.find().toArray();
+
+console.log(words);`,
+    codeLanguage: "javascript",
   },
   {
     name: "문서",
@@ -129,6 +213,12 @@ const seedWords = [
       "MongoDB에 저장되는 데이터 한 건입니다. 여러 필드와 값으로 구성되며 단어 하나의 정보를 담을 수 있습니다.",
     category: "데이터",
     tags: ["MongoDB", "필드"],
+    codeExample: `await database.collection("words").insertOne({
+  name: "HTTP",
+  category: "웹 기초",
+  tags: ["통신"],
+});`,
+    codeLanguage: "javascript",
   },
   {
     name: "쿼리",
@@ -137,6 +227,11 @@ const seedWords = [
       "데이터베이스에 원하는 데이터를 찾거나 처리하도록 요청하는 명령입니다. 특정 카테고리의 단어를 찾는 요청이 한 예입니다.",
     category: "데이터",
     tags: ["조회"],
+    codeExample: `const reactWords = await database
+  .collection("words")
+  .find({ category: "React" })
+  .toArray();`,
+    codeLanguage: "javascript",
   },
   {
     name: "App Router",
@@ -145,6 +240,13 @@ const seedWords = [
       "Next.js의 app 폴더 구조를 이용해 페이지 주소와 공통 화면 구조를 구성하는 라우팅 방식입니다.",
     category: "Next.js",
     tags: ["라우팅"],
+    codeExample: `app/
+  layout.js
+  page.js
+  words/
+    [slug]/
+      page.js`,
+    codeLanguage: "text",
   },
   {
     name: "Layout",
@@ -153,6 +255,14 @@ const seedWords = [
       "여러 페이지가 함께 사용하는 화면 구조입니다. 공통 메뉴나 페이지를 감싸는 틀을 구성할 때 사용합니다.",
     category: "Next.js",
     tags: ["공통 UI"],
+    codeExample: `export default function RootLayout({ children }) {
+  return (
+    <html lang="ko">
+      <body>{children}</body>
+    </html>
+  );
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "동적 라우팅",
@@ -161,6 +271,12 @@ const seedWords = [
       "주소의 일부를 변수처럼 사용해 서로 다른 내용을 보여주는 방식입니다. 단어 슬러그에 따라 해당 단어의 상세 화면을 보여줄 수 있습니다.",
     category: "Next.js",
     tags: ["라우팅", "URL"],
+    codeExample: `export default async function WordPage({ params }) {
+  const { slug } = await params;
+
+  return <h1>{slug}</h1>;
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "서버 컴포넌트",
@@ -169,6 +285,14 @@ const seedWords = [
       "서버에서 실행되는 React 컴포넌트입니다. 데이터베이스에서 데이터를 가져오고 화면을 구성할 수 있습니다.",
     category: "Next.js",
     tags: ["서버", "React"],
+    codeExample: `import { connection } from "next/server";
+
+export default async function WordListPage() {
+  await connection();
+
+  return <h1>개발자 단어장</h1>;
+}`,
+    codeLanguage: "jsx",
   },
   {
     name: "Server Action",
@@ -177,6 +301,14 @@ const seedWords = [
       "폼 제출이나 버튼 동작에서 호출하여 서버에서 실행하는 비동기 함수입니다. 데이터를 등록하거나 수정하는 작업에 사용할 수 있습니다.",
     category: "Next.js",
     tags: ["서버", "폼"],
+    codeExample: `"use server";
+
+export async function saveWord(formData) {
+  const name = String(formData.get("name"));
+
+  console.log(name);
+}`,
+    codeLanguage: "javascript",
   },
   {
     name: "변수",
@@ -185,6 +317,10 @@ const seedWords = [
       "값을 저장하고 이름을 붙여 다시 사용할 수 있게 하는 방법입니다. 사용자 이름이나 검색어 같은 값을 다룰 때 사용합니다.",
     category: "JavaScript",
     tags: ["기초 문법"],
+    codeExample: `const searchKeyword = "React";
+
+console.log(searchKeyword);`,
+    codeLanguage: "javascript",
   },
   {
     name: "함수",
@@ -193,6 +329,12 @@ const seedWords = [
       "특정 작업을 수행하는 코드를 묶어 두고 필요할 때 호출하는 단위입니다. 값을 전달받고 처리 결과를 반환할 수 있습니다.",
     category: "JavaScript",
     tags: ["재사용"],
+    codeExample: `function describeWord(name) {
+  return name + " 단어를 공부합니다.";
+}
+
+console.log(describeWord("HTTP"));`,
+    codeLanguage: "javascript",
   },
   {
     name: "배열",
@@ -201,6 +343,10 @@ const seedWords = [
       "여러 값을 순서대로 담는 자료형입니다. 여러 단어의 목록이나 한 단어의 태그를 저장할 때 사용할 수 있습니다.",
     category: "JavaScript",
     tags: ["자료형", "목록"],
+    codeExample: `const tags = ["JavaScript", "배열", "목록"];
+
+console.log(tags[0]);`,
+    codeLanguage: "javascript",
   },
   {
     name: "객체",
@@ -209,6 +355,14 @@ const seedWords = [
       "관련된 데이터를 속성 이름과 값의 쌍으로 묶는 자료형입니다. 단어 하나의 이름, 설명, 카테고리를 함께 표현할 수 있습니다.",
     category: "JavaScript",
     tags: ["자료형"],
+    codeExample: `const word = {
+  name: "HTTP",
+  category: "웹 기초",
+  tags: ["통신", "요청"],
+};
+
+console.log(word.name);`,
+    codeLanguage: "javascript",
   },
   {
     name: "Promise",
@@ -217,6 +371,13 @@ const seedWords = [
       "비동기 작업의 성공 결과나 실패 이유를 다루는 객체입니다. 서버 요청처럼 결과가 나중에 준비되는 상황에 사용합니다.",
     category: "JavaScript",
     tags: ["비동기"],
+    codeExample: `async function loadWords() {
+  const response = await fetch("/api/words");
+  return response.json();
+}
+
+const words = await loadWords();`,
+    codeLanguage: "javascript",
   },
   {
     name: "Git",
@@ -225,6 +386,9 @@ const seedWords = [
       "파일의 변경 이력을 기록하고 관리하는 버전 관리 도구입니다. 이전 변경을 확인하거나 여러 사람이 함께 개발할 때 사용합니다.",
     category: "기타",
     tags: ["버전 관리"],
+    codeExample: `git status
+git log --oneline`,
+    codeLanguage: "bash",
   },
   {
     name: "커밋",
@@ -233,6 +397,9 @@ const seedWords = [
       "Git에서 선택한 파일의 변경 내용을 하나의 기록으로 남기는 작업입니다. 어떤 변경인지 설명하는 메시지를 함께 작성합니다.",
     category: "기타",
     tags: ["Git", "변경 이력"],
+    codeExample: `git add .
+git commit -m "단어 설명 추가"`,
+    codeLanguage: "bash",
   },
   {
     name: "브랜치",
@@ -241,6 +408,9 @@ const seedWords = [
       "Git에서 다른 작업과 구분해 변경을 쌓아 갈 수 있는 개발 흐름입니다. 새 기능을 별도로 개발할 때 사용할 수 있습니다.",
     category: "기타",
     tags: ["Git"],
+    codeExample: `git switch -c feature/word-search
+git branch`,
+    codeLanguage: "bash",
   },
   {
     name: "디버깅",
@@ -249,6 +419,10 @@ const seedWords = [
       "프로그램이 예상과 다르게 동작하는 원인을 찾고 수정하는 과정입니다. 오류 메시지나 변수 값을 확인하며 문제를 좁혀 갑니다.",
     category: "기타",
     tags: [],
+    codeExample: `const selectedCategory = "React";
+
+console.log("선택한 카테고리:", selectedCategory);`,
+    codeLanguage: "javascript",
   },
   {
     name: "리팩터링",
@@ -257,6 +431,12 @@ const seedWords = [
       "프로그램의 외부 동작을 유지하면서 내부 코드 구조를 개선하는 작업입니다. 읽기 쉽고 수정하기 편한 코드로 정리하는 것이 목적입니다.",
     category: "기타",
     tags: ["코드 개선"],
+    codeExample: `function normalizeWord(word) {
+  return word.trim().toLowerCase();
+}
+
+console.log(normalizeWord("  React  "));`,
+    codeLanguage: "javascript",
   },
 ];
 
@@ -337,7 +517,7 @@ function validateSeedData() {
     }
   }
 
-  // 각 단어의 필수값, 카테고리, slug, tags가 올바른지 확인합니다.
+  // 각 단어의 필수값, 분류, 주소, 코드 예시가 올바른지 확인합니다.
   const slugs = new Set();
 
   for (const word of seedWords) {
@@ -364,6 +544,16 @@ function validateSeedData() {
       word.tags.some((tag) => typeof tag !== "string" || !tag.trim())
     ) {
       throw new Error(`${word.name}의 tags는 문자열 배열이어야 합니다.`);
+    }
+
+    if (typeof word.codeExample !== "string" || !word.codeExample.trim()) {
+      throw new Error(`${word.name}의 codeExample은 비어 있을 수 없습니다.`);
+    }
+
+    if (!codeLanguages.includes(word.codeLanguage)) {
+      throw new Error(
+        `${word.name}의 codeLanguage는 ${codeLanguages.join(", ")} 중 하나여야 합니다.`
+      );
     }
 
     slugs.add(word.slug);
@@ -525,7 +715,7 @@ async function seedTestUsers(auth, database) {
   return userIdsByEmail;
 }
 
-// slug로 기존 단어를 확인하고, 없는 단어만 words 컬렉션에 저장합니다.
+// slug로 기존 단어를 확인하고, 새 단어 또는 빠진 코드 예시를 저장합니다.
 async function seedDictionaryWords(database) {
   const wordCollection = database.collection("words");
   const wordIdsBySlug = new Map();
@@ -538,6 +728,36 @@ async function seedDictionaryWords(database) {
 
     if (existingWord) {
       wordIdsBySlug.set(seedWord.slug, existingWord._id.toString());
+
+      // 기존 단어에서 빠진 코드 필드만 채워 사용자가 수정한 다른 값은 보존합니다.
+      const missingCodeFields = {};
+
+      if (
+        typeof existingWord.codeExample !== "string" ||
+        !existingWord.codeExample.trim()
+      ) {
+        missingCodeFields.codeExample = seedWord.codeExample;
+      }
+
+      if (!codeLanguages.includes(existingWord.codeLanguage)) {
+        missingCodeFields.codeLanguage = seedWord.codeLanguage;
+      }
+
+      if (Object.keys(missingCodeFields).length > 0) {
+        await wordCollection.updateOne(
+          { _id: existingWord._id },
+          {
+            $set: {
+              ...missingCodeFields,
+              updatedAt: new Date(),
+            },
+          }
+        );
+
+        console.log(`[보충] 단어 코드 예시: ${seedWord.name}`);
+        continue;
+      }
+
       console.log(`[유지] 단어: ${seedWord.name}`);
       continue;
     }
@@ -613,6 +833,7 @@ function printDryRunResult() {
 
   console.log(`테스트 사용자: ${seedUsers.length}명`);
   console.log(`개인 메모: ${seedMemos.length}개`);
+  console.log(`코드 언어: ${codeLanguages.join(", ")}`);
   console.log("--dry-run에서는 MongoDB 데이터를 변경하지 않았습니다.");
 }
 
