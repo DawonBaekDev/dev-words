@@ -80,7 +80,7 @@ export default function QuizClient({ category }) {
     <section aria-labelledby="quiz-start-heading">
       <h2 id="quiz-start-heading">AI 퀴즈</h2>
       <p>선택한 카테고리: <strong>{category}</strong> · <Link href="/quiz">카테고리 변경</Link></p>
-      <p>난이도를 선택하면 현재 등록된 {category === "전체" ? "전체 단어" : `${category} 단어`}에서 {QUIZ_QUESTION_COUNT}문제를 만듭니다.</p>
+      <p>난이도를 선택하면 현재 등록된 {category === "전체" ? "전체 단어" : `${category} 단어`}에서 {QUIZ_QUESTION_COUNT}문제를 출제합니다.</p>
       <form action={quizFormAction}>
         <input type="hidden" name="category" value={category} />
         <fieldset>
@@ -93,13 +93,13 @@ export default function QuizClient({ category }) {
           ))}
         </fieldset>
         <button type="submit" disabled={isQuizPending}>
-          {isQuizPending ? "AI가 퀴즈를 만들고 있습니다." : "AI 퀴즈 시작"}
+          {isQuizPending ? "퀴즈를 준비하고 있습니다." : "AI 퀴즈 시작"}
         </button>
         {isQuizPending ? (
           <p role="status" aria-live="polite">
             퀴즈를 준비하고 있어요. 잠시만 기다려 주세요.
             <br />
-            문제를 만드는 데 시간이 조금 걸릴 수 있습니다.
+            새로운 문제가 필요한 경우 AI 생성에 시간이 걸릴 수 있습니다.
           </p>
         ) : (
           <ActionMessage state={quizState} />

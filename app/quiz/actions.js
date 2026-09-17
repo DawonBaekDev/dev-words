@@ -1,5 +1,6 @@
 "use server";
 
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentSession } from "@/lib/auth/session";
 import { canUseAiQuiz } from "@/lib/ai/access";
@@ -9,15 +10,20 @@ import {
   createQuizSession,
   endAiRun,
 } from "@/lib/ai/data";
-import { generateAiQuiz } from "@/lib/ai/quiz";
+import { prepareBankQuiz, replenishQuizBank } from "@/lib/ai/quiz-bank";
 import { QUIZ_CATEGORIES, QUIZ_DIFFICULTIES, QUIZ_QUESTION_COUNT, validateQuizAnswers } from "@/lib/ai/validation";
-import { findRandomWords } from "@/lib/words/data";
 
 function actionResult(type, message, extra = {}) {
   return { type, message, submittedAt: Date.now(), ...extra };
 }
 
 function aiQuizErrorMessage(error) {
+  if (error?.message === "QUIZ_WORDS_INSUFFICIENT") {
+    return `선택한 카테고리에 퀴즈를 만들 단어가 ${QUIZ_QUESTION_COUNT}개 이상 필요합니다.`;
+  }
+  if (error?.message === "QUIZ_WORDS_CHANGED") {
+    return "단어가 변경되어 문제를 준비하지 못했습니다. 다시 시도해 주세요.";
+  }
   if (error?.message === "AI_CLI_UNAVAILABLE") {
     return "서버에서 Codex CLI를 찾지 못했습니다. 설치 경로를 확인해 주세요.";
   }
@@ -63,13 +69,6 @@ export async function generateQuiz(previousState, formData) {
   let runId = "";
 
   try {
-    // 생성 직전의 단어 목록에서 뽑아 새로 등록된 단어도 출제 대상에 포함합니다.
-    const words = await findRandomWords(QUIZ_QUESTION_COUNT, category);
-
-    if (words.length !== QUIZ_QUESTION_COUNT) {
-      return actionResult("error", `선택한 카테고리에 퀴즈를 만들 단어가 ${QUIZ_QUESTION_COUNT}개 이상 필요합니다.`);
-    }
-
     const run = await beginAiRun({ userId: user.id, type: "quiz" });
 
     if (!run.started) {
@@ -82,8 +81,16 @@ export async function generateQuiz(previousState, formData) {
     }
 
     runId = run.runId;
-    const quiz = await generateAiQuiz({ difficulty, words });
+    const quiz = await prepareBankQuiz({ userId: user.id, category, difficulty });
     const quizId = await createQuizSession({ userId: user.id, quiz, category });
+
+    after(async () => {
+      try {
+        await replenishQuizBank(category, difficulty);
+      } catch (error) {
+        console.error("문제은행 보충 실패:", error);
+      }
+    });
 
     return actionResult("success", "퀴즈가 준비되었습니다.", {
       quizId,

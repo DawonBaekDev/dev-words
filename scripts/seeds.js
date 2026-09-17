@@ -677,6 +677,8 @@ function validateSeedData() {
 
 // 중복 데이터 생성을 DB 단계에서도 막을 수 있도록 고유 인덱스를 만듭니다.
 async function createIndexes(database) {
+  await database.collection("quizQuestions").createIndex({ difficulty: 1, category: 1 });
+  await database.collection("quizSessions").createIndex({ userId: 1, createdAt: -1 });
   await database.collection("favorites").createIndex({ userId: 1, wordId: 1 }, { unique: true, name: "unique_favorite_per_user_and_word" });
   await database.collection("recentWords").createIndex({ userId: 1 }, { unique: true, name: "unique_recent_words_per_user" });
   // 같은 slug를 사용하는 단어가 두 개 이상 저장되지 않게 합니다.

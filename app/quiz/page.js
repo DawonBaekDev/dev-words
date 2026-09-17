@@ -7,6 +7,8 @@ import { QUIZ_CATEGORIES, QUIZ_QUESTION_COUNT } from "@/lib/ai/validation";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findQuizCategoryCounts } from "@/lib/words/data";
 
+export const maxDuration = 180;
+
 export const metadata = {
   title: "AI 퀴즈",
 };
