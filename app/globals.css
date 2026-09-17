@@ -325,6 +325,64 @@ dialog {
   font-weight: 700;
 }
 
+.word-source-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.word-source-card {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--standard-border-radius);
+  background: var(--accent-bg);
+}
+
+.word-source-card span {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.word-source-card small {
+  overflow-wrap: anywhere;
+}
+
+.word-history-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.word-history-filters a {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--standard-border-radius);
+  text-decoration: none;
+}
+
+.word-history-filters a[aria-current="page"] {
+  background: var(--accent);
+  color: white;
+}
+
+.word-history-list > li > details > summary {
+  overflow-wrap: anywhere;
+}
+
+.word-history-list > li > details > summary > * {
+  display: inline-block;
+  margin-right: 0.75rem;
+}
+
+.word-history-change p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .request-list {
   display: grid;
   gap: 1rem;

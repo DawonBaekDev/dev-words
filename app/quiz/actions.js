@@ -5,12 +5,12 @@ import { getCurrentSession } from "@/lib/auth/session";
 import { canUseAiQuiz } from "@/lib/ai/access";
 import {
   beginAiRun,
-  consumeQuizSession,
+  completeQuizSession,
   createQuizSession,
   endAiRun,
 } from "@/lib/ai/data";
 import { generateAiQuiz } from "@/lib/ai/quiz";
-import { QUIZ_DIFFICULTIES, validateQuizAnswers } from "@/lib/ai/validation";
+import { QUIZ_CATEGORIES, QUIZ_DIFFICULTIES, QUIZ_QUESTION_COUNT, validateQuizAnswers } from "@/lib/ai/validation";
 import { findRandomWords } from "@/lib/words/data";
 
 function actionResult(type, message, extra = {}) {
@@ -50,14 +50,26 @@ export async function generateQuiz(previousState, formData) {
   }
 
   const difficulty = formData.get("difficulty");
+  const category = formData.get("category");
 
   if (typeof difficulty !== "string" || !QUIZ_DIFFICULTIES.includes(difficulty)) {
     return actionResult("error", "올바른 난이도를 선택해 주세요.");
   }
 
+  if (typeof category !== "string" || !QUIZ_CATEGORIES.includes(category)) {
+    return actionResult("error", "올바른 카테고리를 선택해 주세요.");
+  }
+
   let runId = "";
 
   try {
+    // 생성 직전의 단어 목록에서 뽑아 새로 등록된 단어도 출제 대상에 포함합니다.
+    const words = await findRandomWords(QUIZ_QUESTION_COUNT, category);
+
+    if (words.length !== QUIZ_QUESTION_COUNT) {
+      return actionResult("error", `선택한 카테고리에 퀴즈를 만들 단어가 ${QUIZ_QUESTION_COUNT}개 이상 필요합니다.`);
+    }
+
     const run = await beginAiRun({ userId: user.id, type: "quiz" });
 
     if (!run.started) {
@@ -70,17 +82,12 @@ export async function generateQuiz(previousState, formData) {
     }
 
     runId = run.runId;
-    const words = await findRandomWords(5);
-
-    if (words.length !== 5) {
-      return actionResult("error", "퀴즈를 만들 단어가 부족합니다.");
-    }
-
     const quiz = await generateAiQuiz({ difficulty, words });
-    const quizId = await createQuizSession({ userId: user.id, quiz });
+    const quizId = await createQuizSession({ userId: user.id, quiz, category });
 
     return actionResult("success", "퀴즈가 준비되었습니다.", {
       quizId,
+      category,
       difficulty: quiz.difficulty,
       questions: quiz.questions.map((question) => ({
         wordId: question.wordId,
@@ -115,21 +122,11 @@ export async function submitQuiz(previousState, formData) {
   const { answers, error } = validateQuizAnswers(formData);
   if (error) return actionResult("error", error);
 
-  const quiz = await consumeQuizSession({ quizId, userId: user.id });
+  const quiz = await completeQuizSession({ quizId, userId: user.id, answers });
 
-  if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length !== 5) {
+  if (!quiz) {
     return actionResult("error", "퀴즈 시간이 지났거나 이미 제출되었습니다. 새 퀴즈를 시작해 주세요.");
   }
 
-  const results = quiz.questions.map((question, index) => ({
-    question: question.question,
-    choices: question.choices,
-    selectedChoiceIndex: answers[index],
-    correctChoiceIndex: question.correctChoiceIndex,
-    explanation: question.explanation,
-    isCorrect: answers[index] === question.correctChoiceIndex,
-  }));
-  const score = results.filter((result) => result.isCorrect).length;
-
-  return actionResult("success", "채점이 완료되었습니다.", { score, results });
+  return actionResult("success", "채점이 완료되었습니다.", { score: quiz.score, results: quiz.results });
 }

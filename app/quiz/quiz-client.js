@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { generateQuiz, submitQuiz } from "./actions";
 import QuizQuestions from "./quiz-questions";
-import { QUIZ_DIFFICULTIES } from "@/lib/ai/validation";
+import { QUIZ_DIFFICULTIES, QUIZ_QUESTION_COUNT } from "@/lib/ai/validation";
 
 const initialActionState = {
   type: "idle",
@@ -24,7 +24,7 @@ function ActionMessage({ state }) {
   );
 }
 
-export default function QuizClient() {
+export default function QuizClient({ category }) {
   const [quizState, quizFormAction, isQuizPending] = useActionState(
     generateQuiz,
     initialActionState
@@ -38,7 +38,8 @@ export default function QuizClient() {
     return (
       <section aria-labelledby="quiz-result-heading">
         <h2 id="quiz-result-heading">AI 퀴즈 결과</h2>
-        <p><strong>{resultState.score}점 / 5점</strong></p>
+        <p>카테고리: <strong>{category}</strong></p>
+        <p><strong>{resultState.score}점 / {QUIZ_QUESTION_COUNT}점</strong></p>
         <ol className="quiz-question-list">
           {resultState.results.map((result, index) => (
             <li key={result.question}>
@@ -52,6 +53,7 @@ export default function QuizClient() {
             </li>
           ))}
         </ol>
+        <p><Link href="/mypage#quiz-notes">퀴즈 노트에서 결과와 메모 보기</Link></p>
         <button type="button" onClick={() => window.location.reload()}>재도전</button>
         <Link href="/mypage">퀴즈 종료</Link>
       </section>
@@ -74,8 +76,10 @@ export default function QuizClient() {
   return (
     <section aria-labelledby="quiz-start-heading">
       <h2 id="quiz-start-heading">AI 퀴즈</h2>
-      <p>난이도를 선택하면 현재 단어장에서 5문제를 만듭니다.</p>
+      <p>선택한 카테고리: <strong>{category}</strong> · <Link href="/quiz">카테고리 변경</Link></p>
+      <p>난이도를 선택하면 현재 등록된 {category === "전체" ? "전체 단어" : `${category} 단어`}에서 {QUIZ_QUESTION_COUNT}문제를 만듭니다.</p>
       <form action={quizFormAction}>
+        <input type="hidden" name="category" value={category} />
         <fieldset>
           <legend>난이도</legend>
           {QUIZ_DIFFICULTIES.map((difficulty) => (

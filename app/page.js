@@ -5,6 +5,7 @@ import NewWordRequest from "./new-word-request";
 import WordActions from "@/components/word-actions";
 import { findFavorites } from "@/lib/activity/data";
 import { findQuizUsage } from "@/lib/ai/data";
+import { QUIZ_QUESTION_COUNT } from "@/lib/ai/validation";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findWords } from "@/lib/words/data";
 import {
@@ -31,7 +32,7 @@ export default async function Home({ searchParams }) {
         <section className="quiz-banner" aria-labelledby="home-quiz-heading">
           <div>
             <h2 id="home-quiz-heading">배운 단어, 퀴즈로 확인해 볼까요?</h2>
-            <p>AI가 만드는 랜덤 5문제 · 하루 5회 도전</p>
+            <p>AI가 만드는 랜덤 {QUIZ_QUESTION_COUNT}문제 · 하루 5회 도전</p>
             {quizUsage && (
               <p>
                 <strong>오늘 {quizUsage.used}회 도전 · {quizUsage.remaining}회 더 도전 가능</strong>

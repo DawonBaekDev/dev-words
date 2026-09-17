@@ -45,7 +45,8 @@ function validateReason(value) {
 }
 
 export async function createAdminWord(previousState, formData) {
-  if (!(await requireAdmin())) {
+  const session = await requireAdmin();
+  if (!session) {
     return actionResult("error", "관리자만 이용할 수 있는 기능입니다.");
   }
 
@@ -79,7 +80,10 @@ export async function createAdminWord(previousState, formData) {
   }
 
   try {
-    const wordId = await createWord(validation.word);
+    const request = typeof normalizedWord === "string" && normalizedWord
+      ? await findPendingRequestGroup(normalizedWord) : null;
+    const source = request?.draft ? "AI요청" : "관리자 작성";
+    const wordId = await createWord(validation.word, session.user, source);
 
     if (typeof normalizedWord === "string" && normalizedWord) {
       await completeWordRequestGroup({ normalizedWord, wordId });

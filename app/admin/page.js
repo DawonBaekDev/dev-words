@@ -4,11 +4,12 @@ import { connection } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
 import AdminEditRequestItem from "./edit-request-item";
 import AdminWordRequestGroup from "./word-request-group";
+import WordHistory from "./word-history";
 import DeleteWord from "./delete-word";
 import AdminWordForm from "./word-form";
 import { findPendingWordEditRequests } from "@/lib/word-edit-requests/data";
 import { findRequestGroups } from "@/lib/word-requests/data";
-import { findWordsByIds, findWords } from "@/lib/words/data";
+import { findWordsByIds, findAdminWordHistory } from "@/lib/words/data";
 
 export const metadata = {
   title: "관리자 페이지",
@@ -22,8 +23,12 @@ function formatDateTime(date) {
   }).format(date);
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }) {
   await connection();
+
+  const source = (await searchParams)?.source;
+  const selectedSource = typeof source === "string" && ["AI요청", "관리자 작성", "초기 데이터"].includes(source)
+    ? source : "전체";
 
   const session = await getCurrentSession();
 
@@ -38,8 +43,9 @@ export default async function AdminPage() {
   const [allGroups, editRequests, words] = await Promise.all([
     findRequestGroups(),
     findPendingWordEditRequests(),
-    findWords({}),
+    findAdminWordHistory(),
   ]);
+  const activeWords = words.filter((word) => !word.deletedAt);
   const requestGroups = allGroups.filter((group) => group.status === "pending");
   const previousGroups = allGroups.filter((group) => group.status !== "pending");
   const editedWords = await findWordsByIds(
@@ -107,12 +113,13 @@ export default async function AdminPage() {
       </details>
 
       <details className="request-accordion">
-        <summary>등록된 단어 관리 · {words.length}개</summary>
+        <summary>등록된 단어 관리 · {activeWords.length}개</summary>
         <AdminWordForm />
         <ul className="request-list">
-          {words.map((word) => <li key={word._id.toString()}>
+          {activeWords.map((word) => <li key={word._id.toString()}>
             <article className="request-card">
               <h3><Link href={`/words/${word.slug}`}>{word.name}</Link></h3>
+              <p>{word.source} · {formatDateTime(word.createdAt)}</p>
               <p>{word.description}</p>
               <div className="form-actions">
                 <Link href={`/words/${word.slug}?edit=true`}>수정</Link>
@@ -122,6 +129,8 @@ export default async function AdminPage() {
           </li>)}
         </ul>
       </details>
+
+      <WordHistory words={words} selectedSource={selectedSource} />
 
       <details open className="request-accordion">
         <summary>기존 단어 수정 요청 {editRequests.length}건</summary>
