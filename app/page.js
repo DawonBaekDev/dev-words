@@ -4,6 +4,7 @@ import QuizEntry from "./quiz-entry";
 import NewWordRequest from "./new-word-request";
 import WordActions from "@/components/word-actions";
 import { findFavorites } from "@/lib/activity/data";
+import { findQuizUsage } from "@/lib/ai/data";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findWords } from "@/lib/words/data";
 import {
@@ -22,6 +23,7 @@ export default async function Home({ searchParams }) {
 
   const favorites = session?.user?.role === "user" ? await findFavorites(session.user.id) : [];
   const favoriteIds = new Set(favorites.map((favorite) => favorite.wordId));
+  const quizUsage = session?.user?.role === "user" ? await findQuizUsage(session.user.id) : null;
 
   return (
     <main>
@@ -30,6 +32,12 @@ export default async function Home({ searchParams }) {
           <div>
             <h2 id="home-quiz-heading">배운 단어, 퀴즈로 확인해 볼까요?</h2>
             <p>AI가 만드는 랜덤 5문제 · 하루 5회 도전</p>
+            {quizUsage && (
+              <p>
+                <strong>오늘 {quizUsage.used}회 도전 · {quizUsage.remaining}회 더 도전 가능</strong>
+                {quizUsage.remaining === 0 && <span> · 내일 다시 도전해 주세요.</span>}
+              </p>
+            )}
           </div>
           <QuizEntry isLoggedIn={session?.user?.role === "user"} />
         </section>

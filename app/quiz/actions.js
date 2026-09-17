@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getCurrentSession } from "@/lib/auth/session";
 import { canUseAiQuiz } from "@/lib/ai/access";
 import {
@@ -93,6 +94,7 @@ export async function generateQuiz(previousState, formData) {
   } finally {
     if (runId) {
       await endAiRun(runId);
+      revalidatePath("/");
     }
   }
 }

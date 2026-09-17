@@ -99,6 +99,8 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
       await ai.endAiRun(run.runId);
     }
     assert.equal((await ai.beginAiRun({ userId, type: "quiz" })).reason, "limit");
+    assert.deepEqual(await ai.findQuizUsage(userId), { used: 5, remaining: 0 });
+    assert.deepEqual(await ai.findQuizUsage(otherUserId), { used: 0, remaining: 5 });
     const quizId = await ai.createQuizSession({ userId, quiz: { difficulty: "하", questions: [] } });
     assert.equal(await ai.consumeQuizSession({ quizId, userId: otherUserId }), null);
     assert.ok(await ai.consumeQuizSession({ quizId, userId }));
