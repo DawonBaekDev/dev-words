@@ -488,20 +488,20 @@ console.log(normalizeWord("  React  "));`,
 const seedUsers = [
   {
     name: "관리자 학습자",
-    email: "learner1@example.com",
-    password: "DevStudy1!Pass",
+    email: "admin@ts.com",
+    password: "1234",
     role: "admin",
   },
   {
     name: "React 학습자",
-    email: "learner2@example.com",
-    password: "DevStudy2!Pass",
+    email: "user1@ts.com",
+    password: "1234",
     role: "user",
   },
   {
     name: "JavaScript 학습자",
-    email: "learner3@example.com",
-    password: "DevStudy3!Pass",
+    email: "user2@ts.com",
+    password: "1234",
     role: "user",
   },
 ];
