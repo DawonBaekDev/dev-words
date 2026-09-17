@@ -37,6 +37,8 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
   const userId = `test-${Date.now()}`;
   const otherUserId = `${userId}-other`;
   const wordId = "111111111111111111111111";
+  const olderWordSlug = `${userId}-older`;
+  const newerWordSlug = `${userId}-newer`;
 
   try {
     // 운영 DB는 seeds.js에서 생성하는 고유 인덱스를 사용합니다. 빈 검증 DB에도 같은 제약을 적용합니다.
@@ -175,6 +177,30 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
     assert.equal(historyWord.history[1].after.description, "수정 검증");
     assert.equal(historyWord.history[1].userId, otherUserId);
     assert.equal((await words.findWordBySlug(slug)).history, undefined);
+
+    await words.createWord({ name: olderWordSlug, slug: olderWordSlug, description: "처음 등록" });
+    await words.createWord({ name: newerWordSlug, slug: newerWordSlug, description: "나중에 등록" });
+    await database.collection("words").updateOne(
+      { slug: olderWordSlug },
+      { $set: { createdAt: new Date("2020-01-01"), updatedAt: new Date("2020-01-01") } }
+    );
+    await database.collection("words").updateOne(
+      { slug: newerWordSlug },
+      { $set: { createdAt: new Date("2021-01-01"), updatedAt: new Date("2021-01-01") } }
+    );
+    await words.updateWordBySlug(olderWordSlug, {
+      name: olderWordSlug, slug: olderWordSlug, description: "최근 수정",
+    });
+    const orderedHistory = await words.findAdminWordHistory();
+    assert.ok(
+      orderedHistory.findIndex((word) => word.slug === olderWordSlug)
+      < orderedHistory.findIndex((word) => word.slug === newerWordSlug)
+    );
+    assert.ok(
+      orderedHistory.find((word) => word.slug === olderWordSlug).updatedAt
+      > orderedHistory.find((word) => word.slug === newerWordSlug).updatedAt
+    );
+
     assert.equal(await words.deleteWordBySlug(slug), true);
     assert.equal(await words.findWordBySlug(slug), null);
     const archive = await database.collection("wordHistory").findOne({ slug });
@@ -209,6 +235,7 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
     }
     await database.collection("user").deleteMany({ id: userId });
     await database.collection("words").deleteMany({ slug: `${userId}-delete` });
+    await database.collection("words").deleteMany({ slug: { $in: [olderWordSlug, newerWordSlug] } });
     await database.collection("words").deleteMany({ slug: { $regex: `^${userId}-quiz-` } });
     await database.collection("wordHistory").deleteMany({ slug: `${userId}-delete` });
     await (await globalThis.devWordsMongoClientPromise).close();

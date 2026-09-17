@@ -43,7 +43,7 @@ export default function WordHistory({ words, selectedSource }) {
               <strong>{source.label}</strong>
               <span>{sourceWords.length}개</span>
               <small>{sourceWords.length > 0
-                ? `최근 등록: ${sourceWords.slice(0, 3).map((word) => word.name).join(", ")}`
+                ? `최근 변경: ${sourceWords.slice(0, 3).map((word) => word.name).join(", ")}`
                 : "등록된 단어가 없습니다."}</small>
             </div>
           );
@@ -70,7 +70,7 @@ export default function WordHistory({ words, selectedSource }) {
               <summary>
                 <span className="word-history-name">{word.name}</span>
                 <span className="request-status">{word.source}</span>
-                <small>{formatDate(word.createdAt)}</small>
+                <small>최근 변경: {formatDate(word.updatedAt ?? word.createdAt)}</small>
                 {word.deletedAt && <small className="deleted-word">삭제된 단어</small>}
               </summary>
               <p>등록 시각: {formatDate(word.createdAt)}</p>
