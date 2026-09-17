@@ -645,7 +645,7 @@ MongoDB는 `wordId`가 실제 단어를 가리키는지 자동으로 보장하�
 
 ### 17.3 서버 실행과 제한
 
-기존 호스트 Codex CLI 방식을 유지합니다. 서버의 `lib/ai`에서 `codex exec --ephemeral --sandbox read-only --skip-git-repo-check --output-schema <schema-file> -`를 실행합니다. 고정 프롬프트와 JSON Schema를 사용하고 사용자 입력은 stdin으로만 전달합니다.
+기존 호스트 Codex CLI 방식을 유지합니다. 서버의 `lib/ai`에서 `codex exec --ephemeral --sandbox read-only --skip-git-repo-check --output-schema <schema-file> -`를 실행합니다. 퀴즈 생성에는 빠른 `gpt-5.6-luna` 모델과 `low` 추론 강도를 사용합니다. 단어 초안 생성은 기존 CLI 기본 모델 설정을 유지합니다. 고정 프롬프트와 JSON Schema를 사용하고 사용자 입력은 stdin으로만 전달합니다.
 
 프로젝트와 분리된 임시 폴더를 사용하고, DB 연결 문자열과 인증 비밀값은 자식 프로세스에 전달하지 않습니다. CLI 설치·인증이 필요하며 `CODEX_CLI_PATH`로 실행 경로를 지정할 수 있습니다. CLI 인증정보는 DB나 저장소에 복사하지 않습니다.
 
