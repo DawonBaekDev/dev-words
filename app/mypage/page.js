@@ -6,8 +6,10 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import WordRequestItem from "./word-request-item";
 import EditRequestItem from "./edit-request-item";
+import PersonalMemos from "./personal-memos";
 import QuizNotes from "./quiz-notes";
 import { getCurrentSession } from "@/lib/auth/session";
+import { findMemosByUser } from "@/lib/memos/data";
 import { findWordEditRequestsByUser } from "@/lib/word-edit-requests/data";
 import { findWordRequestsByUser } from "@/lib/word-requests/data";
 import { findWordsByIds } from "@/lib/words/data";
@@ -16,7 +18,7 @@ export const metadata = {
   title: "마이페이지",
 };
 
-const MY_PAGE_TABS = ["scraps", "recent", "quiz", "requests"];
+const MY_PAGE_TABS = ["scraps", "recent", "memos", "quiz", "requests"];
 
 function formatDateTime(date) {
   return new Intl.DateTimeFormat("ko-KR", {
@@ -47,15 +49,16 @@ export default async function MyPage({ searchParams }) {
     redirect("/admin");
   }
 
-  const [requests, editRequests, favorites, recentWords] = await Promise.all([
+  const [requests, editRequests, favorites, recentWords, memos] = await Promise.all([
     findWordRequestsByUser(session.user.id),
     findWordEditRequestsByUser(session.user.id),
     findFavorites(session.user.id),
     findRecentWords(session.user.id),
+    findMemosByUser(session.user.id),
   ]);
   const linkedWordIds = [
     ...new Set(
-      [...requests, ...editRequests, ...favorites, ...recentWords]
+      [...requests, ...editRequests, ...favorites, ...recentWords, ...memos]
         .map((request) => request.wordId)
         .filter((wordId) => typeof wordId === "string")
     ),
@@ -85,6 +88,7 @@ export default async function MyPage({ searchParams }) {
         <dl className="account-stats">
           <div><dt>스크랩</dt><dd>{favoriteWords.length}</dd></div>
           <div><dt>최근 본 단어</dt><dd>{recentWords.length}</dd></div>
+          <div><dt>개인 메모</dt><dd>{memos.length}</dd></div>
           <div><dt>처리 대기 요청</dt><dd>{pendingRequestCount}</dd></div>
         </dl>
       </section>
@@ -92,6 +96,7 @@ export default async function MyPage({ searchParams }) {
       <nav className="account-tabs" aria-label="마이페이지 메뉴">
         <Link href="/mypage?tab=scraps" aria-current={selectedTab === "scraps" ? "page" : undefined}>스크랩 <span>{favoriteWords.length}</span></Link>
         <Link href="/mypage?tab=recent" aria-current={selectedTab === "recent" ? "page" : undefined}>최근 본 단어 <span>{recentWords.length}</span></Link>
+        <Link href="/mypage?tab=memos" aria-current={selectedTab === "memos" ? "page" : undefined}>개인 메모 <span>{memos.length}</span></Link>
         <Link href="/mypage?tab=quiz" aria-current={selectedTab === "quiz" ? "page" : undefined}>퀴즈 노트</Link>
         <Link href="/mypage?tab=requests" aria-current={selectedTab === "requests" ? "page" : undefined}>요청 내역 <span>{requests.length + editRequests.length}</span></Link>
       </nav>
@@ -139,6 +144,8 @@ export default async function MyPage({ searchParams }) {
           </ul>
         </>}
       </section>}
+
+      {selectedTab === "memos" && <section className="account-panel account-memo-panel"><PersonalMemos memos={memos} wordsById={wordsById} /></section>}
 
       {selectedTab === "quiz" && <section className="account-panel account-quiz-panel"><QuizNotes userId={session.user.id} error={quizMemoError} /></section>}
 

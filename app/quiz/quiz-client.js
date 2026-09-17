@@ -107,7 +107,7 @@ export default function QuizClient({ category }) {
           <p role="status" aria-live="polite">
             퀴즈를 준비하고 있어요. 잠시만 기다려 주세요.
             <br />
-            새로운 문제가 필요한 경우 AI 생성에 시간이 걸릴 수 있습니다.
+            새로운 문제가 필요한 경우 AI 생성에 약 10~15초 소요될 예정입니다.
           </p>
         ) : (
           <ActionMessage state={quizState} />

@@ -37,12 +37,29 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
   const wordId = "111111111111111111111111";
 
   try {
+    // 운영 DB는 seeds.js에서 생성하는 고유 인덱스를 사용합니다. 빈 검증 DB에도 같은 제약을 적용합니다.
+    await database.collection("memos").createIndex({ userId: 1, wordId: 1 }, { unique: true });
+    await database.collection("favorites").createIndex({ userId: 1, wordId: 1 }, { unique: true });
+    await database.collection("wordRequests").createIndex(
+      { userId: 1, normalizedWord: 1 },
+      { unique: true, partialFilterExpression: { status: "pending" } }
+    );
+    await database.collection("aiUsage").createIndex({ userId: 1, type: 1, dateKey: 1 }, { unique: true });
+    await database.collection("aiRuns").createIndex(
+      { userId: 1, type: 1 },
+      { unique: true, partialFilterExpression: { status: "running" } }
+    );
+
     await memos.savePersonalMemo({ userId, wordId, content: "등록 내용" });
     await memos.savePersonalMemo({ userId, wordId, content: "수정 내용" });
+    assert.deepEqual((await memos.findMemosByUser(userId)).map((item) => item.content), ["수정 내용"]);
+    assert.deepEqual(await memos.findMemosByUser(otherUserId), []);
     await memos.deletePersonalMemo({ userId, wordId });
     assert.equal(await memos.findMemoByUserAndWord(userId, wordId), null);
     assert.equal(await memos.findMemoByUserAndWord(otherUserId, wordId), null);
+    assert.deepEqual(await memos.findMemosByUser(userId), []);
     await memos.savePersonalMemo({ userId, wordId, content: "재등록 내용" });
+    assert.deepEqual((await memos.findMemosByUser(userId)).map((item) => item.content), ["재등록 내용"]);
     const memo = await memos.findMemoByUserAndWord(userId, wordId);
     assert.deepEqual(memo.history.map((entry) => entry.type), ["created", "updated", "deleted", "created"]);
     assert.deepEqual(memo.history.map((entry) => entry.content), ["등록 내용", "수정 내용", "수정 내용", "재등록 내용"]);
