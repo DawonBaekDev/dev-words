@@ -237,7 +237,7 @@ dialog {
 .word-list > li {
   display: flex;
   flex-direction: column;
-  padding: 0.35rem 0.35rem 0;
+  padding: 1.25rem 1.25rem 0;
   background: var(--bg);
 }
 
