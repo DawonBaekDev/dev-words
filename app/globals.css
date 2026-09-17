@@ -483,6 +483,23 @@ dialog {
   padding-left: 1.5rem;
 }
 
+.quiz-text p {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.quiz-text pre {
+  max-width: 100%;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+}
+
+.quiz-inline-text code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 main > .quiz-banner {
   display: flex;
   flex-wrap: wrap;

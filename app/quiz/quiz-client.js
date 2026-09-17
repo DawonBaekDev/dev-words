@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { generateQuiz, submitQuiz } from "./actions";
 import QuizQuestions from "./quiz-questions";
+import QuizText from "@/components/quiz-text";
 import { QUIZ_DIFFICULTIES, QUIZ_QUESTION_COUNT } from "@/lib/ai/validation";
 
 const initialActionState = {
@@ -43,13 +44,15 @@ export default function QuizClient({ category }) {
         <ol className="quiz-question-list">
           {resultState.results.map((result, index) => (
             <li key={result.question}>
-              <h3>{index + 1}. {result.question}</h3>
+              <h3>{index + 1}번 문제</h3>
+              <QuizText text={result.question} />
               <p className={result.isCorrect ? "status-message success" : "status-message error"}>
                 {result.isCorrect ? "정답입니다." : "오답입니다."}
               </p>
-              <p>선택한 답: {result.choices[result.selectedChoiceIndex]}</p>
-              <p>정답: {result.choices[result.correctChoiceIndex]}</p>
-              <p>해설: {result.explanation}</p>
+              <p>선택한 답: <QuizText text={result.choices[result.selectedChoiceIndex]} inline /></p>
+              <p>정답: <QuizText text={result.choices[result.correctChoiceIndex]} inline /></p>
+              <p>해설</p>
+              <QuizText text={result.explanation} />
             </li>
           ))}
         </ol>
