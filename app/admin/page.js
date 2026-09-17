@@ -23,8 +23,12 @@ function formatDateTime(date) {
   }).format(date);
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }) {
   await connection();
+
+  const source = (await searchParams)?.source;
+  const selectedSource = typeof source === "string" && ["AI요청", "관리자 작성", "초기 데이터"].includes(source)
+    ? source : "전체";
 
   const session = await getCurrentSession();
 
@@ -126,7 +130,7 @@ export default async function AdminPage() {
         </ul>
       </details>
 
-      <WordHistory words={words} />
+      <WordHistory words={words} selectedSource={selectedSource} />
 
       <details open className="request-accordion">
         <summary>기존 단어 수정 요청 {editRequests.length}건</summary>

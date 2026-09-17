@@ -820,8 +820,12 @@ async function seedDictionaryWords(database) {
     if (existingWord) {
       wordIdsBySlug.set(seedWord.slug, existingWord._id.toString());
 
-      // 기존 단어에서 빠진 직역 의미와 코드 필드만 채워 다른 값은 보존합니다.
+      // 기존 단어의 비어 있는 출처·직역 의미·코드 필드만 채워 다른 값은 보존합니다.
       const missingWordFields = {};
+
+      if (!existingWord.source || ["기존 등록 · 경로 미확인", "초기 데이터"].includes(existingWord.source)) {
+        missingWordFields.source = "초기 설정 데이터";
+      }
 
       if (!isValidMeaning(existingWord.meaning)) {
         missingWordFields.meaning = seedWord.meaning;
@@ -862,6 +866,7 @@ async function seedDictionaryWords(database) {
     const now = new Date();
     const insertResult = await wordCollection.insertOne({
       ...seedWord,
+      source: "초기 설정 데이터",
       createdAt: now,
       updatedAt: now,
     });
@@ -995,6 +1000,18 @@ async function runSeed() {
     await createIndexes(database);
     if (process.argv.includes("--indexes-only")) {
       console.log("인덱스 준비 완료. 초기 데이터는 추가하지 않았습니다.");
+      return;
+    }
+
+    if (process.argv.includes("--sources-only")) {
+      const result = await database.collection("words").updateMany(
+        {
+          slug: { $in: seedWords.map((word) => word.slug) },
+          $or: [{ source: { $exists: false } }, { source: null }, { source: "" }, { source: "기존 등록 · 경로 미확인" }, { source: "초기 데이터" }],
+        },
+        { $set: { source: "초기 설정 데이터" } }
+      );
+      console.log(`초기 설정 데이터 출처 갱신: ${result.modifiedCount}개`);
       return;
     }
 
