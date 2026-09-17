@@ -88,7 +88,15 @@ export default function QuizClient() {
         <button type="submit" disabled={isQuizPending}>
           {isQuizPending ? "AI가 퀴즈를 만들고 있습니다." : "AI 퀴즈 시작"}
         </button>
-        <ActionMessage state={quizState} />
+        {isQuizPending ? (
+          <p role="status" aria-live="polite">
+            퀴즈를 준비하고 있어요. 잠시만 기다려 주세요.
+            <br />
+            문제를 만드는 데 시간이 조금 걸릴 수 있습니다.
+          </p>
+        ) : (
+          <ActionMessage state={quizState} />
+        )}
       </form>
     </section>
   );
