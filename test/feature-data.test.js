@@ -107,15 +107,27 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
     assert.equal(await ai.consumeQuizSession({ quizId, userId }), null);
 
     const slug = `${userId}-delete`;
-    await words.createWord({ name: slug, slug, description: "삭제 검증" });
+    await words.createWord({ name: slug, slug, description: "삭제 검증" }, { id: userId, email: "admin@example.com" }, "AI요청");
+    await words.updateWordBySlug(slug, { name: slug, slug, description: "수정 검증" }, { id: otherUserId, email: "editor@example.com" });
+    const historyWord = (await words.findAdminWordHistory()).find((word) => word.slug === slug);
+    assert.equal(historyWord.source, "AI요청");
+    assert.equal(historyWord.history[1].before.description, "삭제 검증");
+    assert.equal(historyWord.history[1].after.description, "수정 검증");
+    assert.equal(historyWord.history[1].userId, otherUserId);
+    assert.equal((await words.findWordBySlug(slug)).history, undefined);
     assert.equal(await words.deleteWordBySlug(slug), true);
     assert.equal(await words.findWordBySlug(slug), null);
+    const archive = await database.collection("wordHistory").findOne({ slug });
+    assert.equal(archive.history.length, 2);
+    assert.equal(archive.source, "AI요청");
+    assert.ok(archive.deletedAt instanceof Date);
   } finally {
     // 이 테스트 실행이 만든 문서만 정리합니다. 기존 데이터에는 접근하지 않습니다.
     for (const name of ["memos", "favorites", "recentWords", "wordRequests", "aiUsage", "aiRuns", "quizSessions"]) {
       await database.collection(name).deleteMany({ userId: { $in: [userId, otherUserId] } });
     }
     await database.collection("words").deleteMany({ slug: `${userId}-delete` });
+    await database.collection("wordHistory").deleteMany({ slug: `${userId}-delete` });
     await (await globalThis.devWordsMongoClientPromise).close();
     globalThis.devWordsMongoClientPromise = undefined;
     hooks.deregister();

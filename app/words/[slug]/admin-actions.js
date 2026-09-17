@@ -21,11 +21,12 @@ function actionResult(type, message) {
 
 async function requireAdmin() {
   const session = await getCurrentSession();
-  return session?.user?.role === "admin";
+  return session?.user?.role === "admin" ? session : null;
 }
 
 export async function updateAdminWord(slug, previousState, formData) {
-  if (!(await requireAdmin())) {
+  const session = await requireAdmin();
+  if (!session) {
     return actionResult("error", "관리자만 이용할 수 있는 기능입니다.");
   }
 
@@ -78,7 +79,9 @@ export async function updateAdminWord(slug, previousState, formData) {
   let shouldRedirectToAdmin = false;
 
   try {
-    await updateWordBySlug(slug, validation.word);
+    if (!(await updateWordBySlug(slug, validation.word, session.user))) {
+      return actionResult("error", "수정할 단어를 찾을 수 없습니다.");
+    }
 
     if (typeof editRequestId === "string" && editRequestId) {
       await completeWordEditRequest({
