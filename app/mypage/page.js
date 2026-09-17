@@ -8,6 +8,7 @@ import WordRequestItem from "./word-request-item";
 import EditRequestItem from "./edit-request-item";
 import PersonalMemos from "./personal-memos";
 import QuizNotes from "./quiz-notes";
+import StudyCalendar from "./study-calendar";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findMemosByUser } from "@/lib/memos/data";
 import { findWordEditRequestsByUser } from "@/lib/word-edit-requests/data";
@@ -18,7 +19,7 @@ export const metadata = {
   title: "마이페이지",
 };
 
-const MY_PAGE_TABS = ["scraps", "recent", "memos", "quiz", "requests"];
+const MY_PAGE_TABS = ["calendar", "scraps", "recent", "memos", "quiz", "requests"];
 
 function formatDateTime(date) {
   return new Intl.DateTimeFormat("ko-KR", {
@@ -38,8 +39,10 @@ export default async function MyPage({ searchParams }) {
     : pageSearchParams?.tab;
   const selectedTab = MY_PAGE_TABS.includes(requestedTab)
     ? requestedTab
-    : "scraps";
+    : "calendar";
   const quizMemoError = pageSearchParams?.quizMemoError;
+  const calendarMonth = Array.isArray(pageSearchParams?.month) ? pageSearchParams.month[0] : pageSearchParams?.month;
+  const calendarDay = Array.isArray(pageSearchParams?.day) ? pageSearchParams.day[0] : pageSearchParams?.day;
 
   if (!session?.user) {
     redirect("/");
@@ -94,12 +97,24 @@ export default async function MyPage({ searchParams }) {
       </section>
 
       <nav className="account-tabs" aria-label="마이페이지 메뉴">
+        <Link href="/mypage?tab=calendar" aria-current={selectedTab === "calendar" ? "page" : undefined}>공부 달력</Link>
         <Link href="/mypage?tab=scraps" aria-current={selectedTab === "scraps" ? "page" : undefined}>스크랩 <span>{favoriteWords.length}</span></Link>
         <Link href="/mypage?tab=recent" aria-current={selectedTab === "recent" ? "page" : undefined}>최근 본 단어 <span>{recentWords.length}</span></Link>
         <Link href="/mypage?tab=memos" aria-current={selectedTab === "memos" ? "page" : undefined}>개인 메모 <span>{memos.length}</span></Link>
         <Link href="/mypage?tab=quiz" aria-current={selectedTab === "quiz" ? "page" : undefined}>퀴즈 노트</Link>
         <Link href="/mypage?tab=requests" aria-current={selectedTab === "requests" ? "page" : undefined}>요청 내역 <span>{requests.length + editRequests.length}</span></Link>
       </nav>
+
+      {selectedTab === "calendar" && <section className="account-panel account-calendar-panel">
+        <StudyCalendar
+          userId={session.user.id}
+          requestedMonth={calendarMonth}
+          requestedDay={calendarDay}
+          error={pageSearchParams?.error}
+          saved={pageSearchParams?.saved}
+          deleted={pageSearchParams?.deleted}
+        />
+      </section>}
 
       {selectedTab === "scraps" && <section className="account-panel" aria-labelledby="scraps-heading">
         <div className="panel-heading">
@@ -147,7 +162,7 @@ export default async function MyPage({ searchParams }) {
 
       {selectedTab === "memos" && <section className="account-panel account-memo-panel"><PersonalMemos memos={memos} wordsById={wordsById} /></section>}
 
-      {selectedTab === "quiz" && <section className="account-panel account-quiz-panel"><QuizNotes userId={session.user.id} error={quizMemoError} /></section>}
+      {selectedTab === "quiz" && <section className="account-panel account-quiz-panel"><QuizNotes userId={session.user.id} error={quizMemoError} openedQuizId={pageSearchParams?.quizId} /></section>}
 
       {selectedTab === "requests" && <section className="account-panel" aria-labelledby="requests-heading">
         <div className="panel-heading"><div><p className="eyebrow">MY REQUESTS</p><h2 id="requests-heading">요청 내역</h2></div><p>처리 상태와 관리자 답변을 확인하세요.</p></div>

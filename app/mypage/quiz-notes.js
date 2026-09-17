@@ -11,7 +11,7 @@ function formatDateTime(date) {
   }).format(date);
 }
 
-export default async function QuizNotes({ userId, error }) {
+export default async function QuizNotes({ userId, error, openedQuizId }) {
   const quizzes = await findCompletedQuizzesByUser(userId);
 
   return (
@@ -23,7 +23,7 @@ export default async function QuizNotes({ userId, error }) {
       {quizzes.length === 0 ? <p>아직 완료한 퀴즈가 없습니다.</p> : quizzes.map((quiz) => {
         const quizId = quiz._id.toString();
         return (
-          <details key={quizId} className="request-accordion">
+          <details key={quizId} id={`quiz-${quizId}`} className="request-accordion" open={openedQuizId === quizId}>
             <summary>{formatDateTime(quiz.completedAt)} · {quiz.category ?? "전체"} · {quiz.score}점 / {QUIZ_QUESTION_COUNT}점</summary>
             <ol className="quiz-question-list">
               {quiz.results.map((result, index) => (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentSession } from "@/lib/auth/session";
+import { findUserEmailsByIds } from "@/lib/auth/users";
 import AdminEditRequestItem from "./edit-request-item";
 import AdminWordRequestGroup from "./word-request-group";
 import WordHistory from "./word-history";
@@ -60,6 +61,10 @@ export default async function AdminPage({ searchParams }) {
   const editedWords = await findWordsByIds(
     editRequests.map((request) => request.wordId)
   );
+  const userEmailsById = await findUserEmailsByIds([
+    ...allGroups.flatMap((group) => group.requests.map((request) => request.userId)),
+    ...editRequests.map((request) => request.userId),
+  ]);
   const wordsById = new Map(
     editedWords.map((word) => [word._id.toString(), word])
   );
@@ -111,6 +116,11 @@ export default async function AdminPage({ searchParams }) {
                     message: group.requests.some((request) => request.draft) ? "해당 카드를 등록할까요?" : "자동생성 실패. 관리자 확인요망",
                     requestedWord: group.requestedWord,
                     requestCount: group.requestCount,
+                    requesters: group.requests.map((request) => ({
+                      id: request._id.toString(),
+                      email: userEmailsById.get(request.userId) ?? `사용자 ID: ${request.userId}`,
+                      requestedAt: formatDateTime(request.createdAt),
+                    })),
                     firstRequestedAt: formatDateTime(group.firstRequestedAt),
                     lastRequestedAt: formatDateTime(group.lastRequestedAt),
                   }}
@@ -129,7 +139,7 @@ export default async function AdminPage({ searchParams }) {
               <h3>{group.requestedWord}</h3>
               <p>{group.status === "completed" ? "처리완료" : "등록불가"} · {group.requestCount}건</p>
               {group.requests.map((request) => <p key={request._id.toString()}>
-                {formatDateTime(request.updatedAt)}{request.rejectionReason && ` · ${request.rejectionReason}`}
+                {userEmailsById.get(request.userId) ?? `사용자 ID: ${request.userId}`} · {formatDateTime(request.updatedAt)}{request.rejectionReason && ` · ${request.rejectionReason}`}
               </p>)}
             </article>
           </li>)}
@@ -175,6 +185,7 @@ export default async function AdminPage({ searchParams }) {
                   <AdminEditRequestItem
                     request={{
                       id: request._id.toString(),
+                      userEmail: userEmailsById.get(request.userId) ?? `사용자 ID: ${request.userId}`,
                       message: request.message,
                       createdAt: formatDateTime(request.createdAt),
                       updatedAt: formatDateTime(request.updatedAt),

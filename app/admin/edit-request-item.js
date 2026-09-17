@@ -26,6 +26,7 @@ export default function AdminEditRequestItem({ request }) {
         <span className="request-status pending">처리 중</span>
       </div>
       <p>{request.message}</p>
+      <p className="request-user"><strong>요청한 사용자:</strong> {request.userEmail}</p>
       <dl className="request-dates">
         <div>
           <dt>요청일</dt>

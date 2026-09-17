@@ -28,6 +28,12 @@ export default function AdminWordRequestGroup({ group }) {
       <p>
         <strong>요청 인원:</strong> {group.requestCount}명
       </p>
+      <ul className="request-user-list" aria-label="요청한 사용자">
+        {group.requesters.map((requester) => <li key={requester.id}>
+          <strong>{requester.email}</strong>
+          <small>{requester.requestedAt}</small>
+        </li>)}
+      </ul>
       <dl className="request-dates">
         <div>
           <dt>첫 요청</dt>

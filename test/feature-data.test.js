@@ -27,6 +27,8 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
   const { getDatabase } = await import("../lib/db/mongodb.js");
   const memos = await import("../lib/memos/data.js");
   const activity = await import("../lib/activity/data.js");
+  const studyCalendar = await import("../lib/study-calendar/data.js");
+  const users = await import("../lib/auth/users.js");
   const requests = await import("../lib/word-requests/data.js");
   const ai = await import("../lib/ai/data.js");
   const { prepareRequestDraft } = await import("../lib/word-requests/draft.js");
@@ -50,6 +52,16 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
       { unique: true, partialFilterExpression: { status: "running" } }
     );
 
+    await database.collection("user").insertOne({ id: userId, email: `${userId}@example.com` });
+    assert.equal((await users.findUserEmailsByIds([userId])).get(userId), `${userId}@example.com`);
+
+    await studyCalendar.saveStudyNote({ userId, dateKey: "2026-09-18", content: "오늘 배운 내용" });
+    await studyCalendar.saveStudyNote({ userId, dateKey: "2026-09-18", content: "수정한 내용" });
+    assert.deepEqual((await studyCalendar.findStudyNotesByMonth(userId, "2026-09")).map((note) => note.content), ["수정한 내용"]);
+    assert.deepEqual(await studyCalendar.findStudyNotesByMonth(otherUserId, "2026-09"), []);
+    await studyCalendar.deleteStudyNote({ userId, dateKey: "2026-09-18" });
+    assert.deepEqual(await studyCalendar.findStudyNotesByMonth(userId, "2026-09"), []);
+
     await memos.savePersonalMemo({ userId, wordId, content: "등록 내용" });
     await memos.savePersonalMemo({ userId, wordId, content: "수정 내용" });
     assert.deepEqual((await memos.findMemosByUser(userId)).map((item) => item.content), ["수정 내용"]);
@@ -69,8 +81,12 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
     await activity.saveFavorite(userId, wordId, true);
     assert.equal((await activity.findFavorites(userId)).length, 1);
     assert.equal((await activity.findFavorites(otherUserId)).length, 0);
+    const scrapHistory = await activity.findScrapHistoryByUserInRange(userId, new Date(0), new Date("2100-01-01"));
+    assert.equal(scrapHistory.length, 1);
+    assert.equal(scrapHistory[0].wordId, wordId);
     await activity.saveFavorite(userId, wordId, false);
     assert.equal((await activity.findFavorites(userId)).length, 0);
+    assert.equal((await activity.findScrapHistoryByUserInRange(userId, new Date(0), new Date("2100-01-01"))).length, 1);
 
     for (let index = 0; index < 12; index++) await activity.recordRecentWord(userId, String(index));
     assert.deepEqual((await activity.findRecentWords(userId)).map((word) => word.wordId), ["11", "10", "9", "8", "7", "6", "5", "4", "3", "2"]);
@@ -179,9 +195,10 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
     assert.ok(refreshedWords.some((word) => word.slug === latestSlug));
   } finally {
     // 이 테스트 실행이 만든 문서만 정리합니다. 기존 데이터에는 접근하지 않습니다.
-    for (const name of ["memos", "favorites", "recentWords", "wordRequests", "aiUsage", "aiRuns", "quizSessions"]) {
+    for (const name of ["memos", "favorites", "scrapHistory", "studyNotes", "recentWords", "wordRequests", "aiUsage", "aiRuns", "quizSessions"]) {
       await database.collection(name).deleteMany({ userId: { $in: [userId, otherUserId] } });
     }
+    await database.collection("user").deleteMany({ id: userId });
     await database.collection("words").deleteMany({ slug: `${userId}-delete` });
     await database.collection("words").deleteMany({ slug: { $regex: `^${userId}-quiz-` } });
     await database.collection("wordHistory").deleteMany({ slug: `${userId}-delete` });
