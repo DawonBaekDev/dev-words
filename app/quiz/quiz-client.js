@@ -37,10 +37,12 @@ export default function QuizClient({ category }) {
 
   if (resultState.results) {
     return (
-      <section aria-labelledby="quiz-result-heading">
+      <section className="quiz-shell quiz-result" aria-labelledby="quiz-result-heading">
         <h2 id="quiz-result-heading">AI 퀴즈 결과</h2>
-        <p>카테고리: <strong>{category}</strong></p>
-        <p><strong>{resultState.score}점 / {QUIZ_QUESTION_COUNT}점</strong></p>
+        <div className="quiz-result-summary">
+          <p>카테고리 <strong>{category}</strong></p>
+          <p><strong>{resultState.score}점 / {QUIZ_QUESTION_COUNT}점</strong></p>
+        </div>
         <ol className="quiz-question-list">
           {resultState.results.map((result, index) => (
             <li key={result.question}>
@@ -56,9 +58,11 @@ export default function QuizClient({ category }) {
             </li>
           ))}
         </ol>
-        <p><Link href="/mypage#quiz-notes">퀴즈 노트에서 결과와 메모 보기</Link></p>
-        <button type="button" onClick={() => window.location.reload()}>재도전</button>
-        <Link href="/mypage">퀴즈 종료</Link>
+        <div className="quiz-result-actions">
+          <Link className="button secondary-button" href="/mypage?tab=quiz#quiz-notes">퀴즈 노트에서 결과와 메모 보기</Link>
+          <button type="button" onClick={() => window.location.reload()}>재도전</button>
+          <Link className="button secondary-button" href="/mypage">퀴즈 종료</Link>
+        </div>
       </section>
     );
   }
@@ -77,24 +81,28 @@ export default function QuizClient({ category }) {
   }
 
   return (
-    <section aria-labelledby="quiz-start-heading">
+    <section className="quiz-shell quiz-start" aria-labelledby="quiz-start-heading">
       <h2 id="quiz-start-heading">AI 퀴즈</h2>
-      <p>선택한 카테고리: <strong>{category}</strong> · <Link href="/quiz">카테고리 변경</Link></p>
-      <p>난이도를 선택하면 현재 등록된 {category === "전체" ? "전체 단어" : `${category} 단어`}에서 {QUIZ_QUESTION_COUNT}문제를 출제합니다.</p>
-      <form action={quizFormAction}>
+      <p className="quiz-meta">선택한 카테고리: <strong>{category}</strong> · <Link href="/quiz">카테고리 변경</Link></p>
+      <p className="quiz-intro">난이도를 선택하면 현재 등록된 {category === "전체" ? "전체 단어" : `${category} 단어`}에서 {QUIZ_QUESTION_COUNT}문제를 출제합니다.</p>
+      <form className="quiz-form" action={quizFormAction}>
         <input type="hidden" name="category" value={category} />
         <fieldset>
           <legend>난이도</legend>
-          {QUIZ_DIFFICULTIES.map((difficulty) => (
-            <label key={difficulty} className="quiz-choice">
-              <input type="radio" name="difficulty" value={difficulty} required />
-              {difficulty}
-            </label>
-          ))}
+          <div className="quiz-option-grid quiz-difficulty-options">
+            {QUIZ_DIFFICULTIES.map((difficulty) => (
+              <label key={difficulty} className="quiz-choice">
+                <input type="radio" name="difficulty" value={difficulty} required />
+                {difficulty}
+              </label>
+            ))}
+          </div>
         </fieldset>
-        <button type="submit" disabled={isQuizPending}>
-          {isQuizPending ? "퀴즈를 준비하고 있습니다." : "AI 퀴즈 시작"}
-        </button>
+        <div className="quiz-primary-action">
+          <button type="submit" disabled={isQuizPending}>
+            {isQuizPending ? "퀴즈를 준비하고 있습니다." : "AI 퀴즈 시작"}
+          </button>
+        </div>
         {isQuizPending ? (
           <p role="status" aria-live="polite">
             퀴즈를 준비하고 있어요. 잠시만 기다려 주세요.

@@ -128,9 +128,9 @@ export default function AuthControls({ user }) {
           <h2 id="auth-title">
             {mode === "login" ? "로그인" : "회원가입"}
           </h2>
-          <button type="button" onClick={closeDialog} aria-label="모달 닫기">
-            닫기
-          </button>
+          <Link href="/" role="button" className="secondary-button auth-home-link" onClick={closeDialog}>
+            홈 화면으로 돌아가기
+          </Link>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -161,7 +161,7 @@ export default function AuthControls({ user }) {
             </p>
           )}
 
-          <div className="form-actions">
+          <div className="form-actions auth-form-actions">
             <button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? "처리 중..."

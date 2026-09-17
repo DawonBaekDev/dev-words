@@ -26,12 +26,12 @@ export default function QuizQuestions({ quiz, formAction, isPending, children })
   }
 
   return (
-    <section aria-labelledby="quiz-question-heading">
+    <section className="quiz-shell quiz-questions" aria-labelledby="quiz-question-heading">
       <h2 id="quiz-question-heading">AI 퀴즈</h2>
-      <p>카테고리: <strong>{quiz.category}</strong></p>
-      <p role="status">문제 {questionIndex + 1} / {quiz.questions.length} · 답변 {answeredCount}개 완료</p>
-      <p>답을 선택하면 다음 문제로 이동합니다. 이전·다음 버튼으로 답을 확인하거나 바꿀 수 있습니다.</p>
-      <form action={formAction}>
+      <p className="quiz-meta">카테고리: <strong>{quiz.category}</strong></p>
+      <p className="quiz-progress" role="status">문제 {questionIndex + 1} / {quiz.questions.length} · 답변 {answeredCount}개 완료</p>
+      <p className="quiz-intro">답을 선택하면 다음 문제로 이동합니다. 이전·다음 버튼으로 답을 확인하거나 바꿀 수 있습니다.</p>
+      <form className="quiz-form" action={formAction}>
         <input type="hidden" name="quizId" value={quiz.quizId} />
         {answers.map((answer, index) => (
           <input key={index} type="hidden" name={`answer-${index}`} value={answer} />
@@ -39,20 +39,22 @@ export default function QuizQuestions({ quiz, formAction, isPending, children })
         <fieldset disabled={isPending} key={question.wordId} aria-describedby={`quiz-question-${questionIndex}`}>
           <legend ref={questionRef} tabIndex={-1}>문제 {questionIndex + 1}</legend>
           <div id={`quiz-question-${questionIndex}`}><QuizText text={question.question} /></div>
-          {question.choices.map((choice, choiceIndex) => (
-            <label key={choice} className="quiz-choice">
-              <input
-                type="radio"
-                name="current-answer"
-                value={choiceIndex}
-                checked={answers[questionIndex] === String(choiceIndex)}
-                onChange={() => selectAnswer(choiceIndex)}
-              />
-              <QuizText text={choice} inline />
-            </label>
-          ))}
+          <div className="quiz-answer-list">
+            {question.choices.map((choice, choiceIndex) => (
+              <label key={choice} className="quiz-choice">
+                <input
+                  type="radio"
+                  name="current-answer"
+                  value={choiceIndex}
+                  checked={answers[questionIndex] === String(choiceIndex)}
+                  onChange={() => selectAnswer(choiceIndex)}
+                />
+                <QuizText text={choice} inline />
+              </label>
+            ))}
+          </div>
         </fieldset>
-        <div className="form-actions">
+        <div className="form-actions quiz-question-actions">
           <button type="button" className="secondary-button" disabled={isPending || questionIndex === 0} onClick={() => setQuestionIndex(questionIndex - 1)}>
             이전 문제
           </button>
