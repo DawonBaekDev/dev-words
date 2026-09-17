@@ -16,6 +16,8 @@ export const metadata = {
   title: "마이페이지",
 };
 
+const MY_PAGE_TABS = ["scraps", "recent", "quiz", "requests"];
+
 function formatDateTime(date) {
   return new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",
@@ -28,7 +30,14 @@ export default async function MyPage({ searchParams }) {
   await connection();
 
   const session = await getCurrentSession();
-  const quizMemoError = (await searchParams)?.quizMemoError;
+  const pageSearchParams = await searchParams;
+  const requestedTab = Array.isArray(pageSearchParams?.tab)
+    ? pageSearchParams.tab[0]
+    : pageSearchParams?.tab;
+  const selectedTab = MY_PAGE_TABS.includes(requestedTab)
+    ? requestedTab
+    : "scraps";
+  const quizMemoError = pageSearchParams?.quizMemoError;
 
   if (!session?.user) {
     redirect("/");
@@ -55,46 +64,73 @@ export default async function MyPage({ searchParams }) {
   const wordsById = new Map(
     linkedWords.map((word) => [word._id.toString(), word])
   );
+  const favoriteWords = favorites.filter((favorite) => wordsById.has(favorite.wordId));
+  const pendingRequestCount = [...requests, ...editRequests].filter(
+    (request) => request.status === "pending"
+  ).length;
 
   return (
-    <main>
-      <p>
+    <main className="account-page">
+      <p className="back-link">
         <Link href="/">← 단어 목록으로</Link>
       </p>
 
-      <section aria-labelledby="mypage-heading">
-        <h2 id="mypage-heading">마이페이지</h2>
-        <p>{session.user.email}님의 새 단어 요청 처리 상태를 확인하세요.</p>
-        <p><Link href="/quiz">AI 퀴즈</Link></p>
+      <section className="account-hero" aria-labelledby="mypage-heading">
+        <div>
+          <p className="eyebrow">MY LEARNING</p>
+          <h2 id="mypage-heading">마이페이지</h2>
+          <p>{session.user.email}님의 학습 기록과 요청 내역을 한곳에서 확인하세요.</p>
+        </div>
+        <Link href="/quiz" role="button">AI 퀴즈 시작</Link>
+        <dl className="account-stats">
+          <div><dt>스크랩</dt><dd>{favoriteWords.length}</dd></div>
+          <div><dt>최근 본 단어</dt><dd>{recentWords.length}</dd></div>
+          <div><dt>처리 대기 요청</dt><dd>{pendingRequestCount}</dd></div>
+        </dl>
       </section>
 
-      <QuizNotes userId={session.user.id} error={quizMemoError} />
+      <nav className="account-tabs" aria-label="마이페이지 메뉴">
+        <Link href="/mypage?tab=scraps" aria-current={selectedTab === "scraps" ? "page" : undefined}>스크랩 <span>{favoriteWords.length}</span></Link>
+        <Link href="/mypage?tab=recent" aria-current={selectedTab === "recent" ? "page" : undefined}>최근 본 단어 <span>{recentWords.length}</span></Link>
+        <Link href="/mypage?tab=quiz" aria-current={selectedTab === "quiz" ? "page" : undefined}>퀴즈 노트</Link>
+        <Link href="/mypage?tab=requests" aria-current={selectedTab === "requests" ? "page" : undefined}>요청 내역 <span>{requests.length + editRequests.length}</span></Link>
+      </nav>
 
-      <details open className="request-accordion">
-        <summary>스크랩한 단어카드 · 목록보기</summary>
-        {favorites.filter((favorite) => wordsById.has(favorite.wordId)).length === 0 && <p>스크랩한 단어카드가 없습니다.</p>}
+      {selectedTab === "scraps" && <section className="account-panel" aria-labelledby="scraps-heading">
+        <div className="panel-heading">
+          <div><p className="eyebrow">SAVED WORDS</p><h2 id="scraps-heading">스크랩한 단어카드</h2></div>
+          <p>최근 스크랩한 순서로 표시합니다.</p>
+        </div>
+        {favoriteWords.length === 0 && <div className="empty-result"><p>스크랩한 단어카드가 없습니다.</p><p>단어 목록에서 별표 버튼을 눌러 저장해 보세요.</p></div>}
         <ul className="word-list">
-          {favorites.map((favorite) => {
+          {favoriteWords.map((favorite) => {
             const word = wordsById.get(favorite.wordId);
-            if (!word) return null;
             return <li key={favorite.wordId}>
-              <h3><Link href={`/words/${word.slug}`}>{word.name}</Link></h3>
-              <p>{word.description}</p>
-              <WordActions slug={word.slug} name={word.name} description={word.description} isUser isFavorite />
+              <article>
+                <p className="word-category">{word.category}</p>
+                <h3><Link href={`/words/${word.slug}`}>{word.name}</Link></h3>
+                <p>{word.description}</p>
+                <WordActions slug={word.slug} name={word.name} description={word.description} isUser isFavorite />
+              </article>
             </li>;
           })}
         </ul>
-      </details>
+      </section>}
 
-      <section aria-labelledby="recent-words-heading">
-        <h2 id="recent-words-heading">최근 본 단어카드</h2>
+      {selectedTab === "recent" && <section className="account-panel" aria-labelledby="recent-words-heading">
+        <div className="panel-heading">
+          <div><p className="eyebrow">RECENTLY VIEWED</p><h2 id="recent-words-heading">최근 본 단어카드</h2></div>
+          {recentWords.length > 0 && <form action={deleteRecentWord.bind(null, null)}><button type="submit" className="secondary-button">최근 기록 모두 삭제</button></form>}
+        </div>
         {recentWords.length === 0 ? <p>최근 본 단어카드가 없습니다.</p> : <>
-          <form action={deleteRecentWord.bind(null, null)}><button type="submit">최근 기록 모두 삭제</button></form>
-          <ul className="request-list">
+          <ul className="recent-word-list">
             {recentWords.map((recent) => {
               const word = wordsById.get(recent.wordId);
-              return <li key={recent.wordId} className="section-heading">
-                {word ? <Link href={`/words/${word.slug}`}>{word.name}</Link> : <span>삭제된 단어</span>}
+              return <li key={recent.wordId}>
+                <div>
+                  {word ? <Link href={`/words/${word.slug}`}>{word.name}</Link> : <span>삭제된 단어</span>}
+                  {word && <small>{word.category}</small>}
+                </div>
                 <form action={deleteRecentWord.bind(null, recent.wordId)}>
                   <button type="submit" aria-label={`${word?.name ?? "삭제된 단어"} 최근 기록 삭제`}>×</button>
                 </form>
@@ -102,10 +138,14 @@ export default async function MyPage({ searchParams }) {
             })}
           </ul>
         </>}
-      </section>
+      </section>}
 
-      <details open className="request-accordion">
-        <summary>새 단어 요청 내역 {requests.length}건</summary>
+      {selectedTab === "quiz" && <section className="account-panel account-quiz-panel"><QuizNotes userId={session.user.id} error={quizMemoError} /></section>}
+
+      {selectedTab === "requests" && <section className="account-panel" aria-labelledby="requests-heading">
+        <div className="panel-heading"><div><p className="eyebrow">MY REQUESTS</p><h2 id="requests-heading">요청 내역</h2></div><p>처리 상태와 관리자 답변을 확인하세요.</p></div>
+        <details open className="request-accordion">
+          <summary>새 단어 요청 <span>{requests.length}</span></summary>
 
         {requests.length === 0 ? (
           <p>아직 새 단어 요청 내역이 없습니다.</p>
@@ -134,10 +174,10 @@ export default async function MyPage({ searchParams }) {
             })}
           </ul>
         )}
-      </details>
+        </details>
 
-      <details open className="request-accordion">
-        <summary>기존 단어 수정 요청 내역 {editRequests.length}건</summary>
+        <details className="request-accordion">
+          <summary>기존 단어 수정 요청 <span>{editRequests.length}</span></summary>
 
         {editRequests.length === 0 ? (
           <p>아직 기존 단어 수정 요청 내역이 없습니다.</p>
@@ -165,7 +205,8 @@ export default async function MyPage({ searchParams }) {
             })}
           </ul>
         )}
-      </details>
+        </details>
+      </section>}
     </main>
   );
 }

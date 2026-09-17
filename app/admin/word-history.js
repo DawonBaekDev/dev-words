@@ -54,7 +54,7 @@ export default function WordHistory({ words, selectedSource }) {
         {[{ value: "전체", label: "전체" }, ...sources].map((source) => (
           <Link
             key={source.value}
-            href={source.value === "전체" ? "/admin#word-history" : `/admin?source=${encodeURIComponent(source.value)}#word-history`}
+            href={source.value === "전체" ? "/admin?tab=history#word-history" : `/admin?tab=history&source=${encodeURIComponent(source.value)}#word-history`}
             aria-current={selectedSource === source.value ? "page" : undefined}
           >
             {source.label}

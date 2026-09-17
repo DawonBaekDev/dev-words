@@ -4,6 +4,9 @@
   --accent-hover: #24469b;
   --accent-bg: #f3f5fa;
   --border: #dce1eb;
+  --panel: #ffffff;
+  --panel-muted: #f8f9fd;
+  --shadow: 0 1rem 2.5rem rgb(49 91 196 / 10%);
   --standard-border-radius: 0.65rem;
 }
 
@@ -332,6 +335,7 @@ dialog {
 .word-list > li {
   display: flex;
   flex-direction: column;
+  min-height: 30rem;
   padding: 1.25rem 1.25rem 0;
   background: var(--bg);
 }
@@ -358,6 +362,7 @@ dialog {
 
 .word-list .word-actions {
   align-self: stretch;
+  min-height: 5.25rem;
   margin-top: auto;
   margin-inline: -1.25rem;
   padding: 1rem 1.25rem;
@@ -397,6 +402,10 @@ dialog {
   color:#fff;
   background-color: #ffb224;
   border-color: #ffb224
+}
+
+.word-list .word-actions button[aria-pressed] {
+  min-width: 8.5rem;
 }
 
 .word-actions button[aria-expanded="false"],
@@ -653,7 +662,7 @@ dialog {
   padding: 1rem 1.25rem;
   cursor: pointer;
   word-break: normal;
-  background: #fff;
+  background: var(--panel);
   overflow: hidden;
 }
 
@@ -722,6 +731,295 @@ dialog {
 .request-card {
   margin: 0;
   padding: 1rem;
+}
+
+.account-page {
+  padding-bottom: 4rem;
+}
+
+.back-link {
+  margin: 1.5rem 0 0.75rem;
+}
+
+.back-link a {
+  color: var(--text-light);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-link a:hover {
+  color: var(--accent);
+}
+
+main > .account-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem 2rem;
+  align-items: center;
+  margin: 0;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at 92% 8%, rgb(49 91 196 / 16%), transparent 30%),
+    linear-gradient(135deg, var(--accent-bg), var(--panel) 72%);
+  box-shadow: var(--shadow);
+}
+
+.account-hero h2,
+.panel-heading h2 {
+  margin: 0;
+}
+
+.account-hero > div > p:last-child {
+  max-width: 42rem;
+  margin-bottom: 0;
+  color: var(--text-light);
+}
+
+.account-hero > a[role="button"] {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.account-stats {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.account-stats > div {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: rgb(255 255 255 / 72%);
+}
+
+.account-stats dt {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.account-stats dd {
+  margin: 0;
+  color: var(--accent);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.account-tabs {
+  position: sticky;
+  z-index: 5;
+  top: 0;
+  display: flex;
+  gap: 0.4rem;
+  margin: 1.5rem 0 0;
+  padding: 0.4rem;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--panel);
+  box-shadow: 0 0.5rem 1.5rem rgb(49 91 196 / 8%);
+}
+
+.account-tabs a {
+  display: flex;
+  flex: 1 0 auto;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.65rem;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.account-tabs a:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.account-tabs a[aria-current="page"] {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 0.35rem 0.9rem rgb(49 91 196 / 22%);
+}
+
+.account-tabs span,
+.request-accordion > summary span {
+  display: inline-grid;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  padding: 0 0.35rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 18%);
+  font-size: 0.75rem;
+}
+
+.account-tabs a:not([aria-current="page"]) span,
+.request-accordion > summary span {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+main > .account-panel {
+  margin: 1rem 0 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.panel-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-heading > p {
+  max-width: 32rem;
+  margin: 0;
+  color: var(--text-light);
+  text-align: right;
+}
+
+.panel-heading form,
+.panel-heading button,
+.panel-heading .admin-word-form {
+  margin: 0;
+}
+
+.recent-word-list {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-word-list li {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  background: var(--panel-muted);
+}
+
+.recent-word-list li > div {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.recent-word-list a {
+  font-size: 1.05rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.recent-word-list small {
+  color: var(--text-light);
+}
+
+.recent-word-list form,
+.recent-word-list button {
+  margin: 0;
+}
+
+.recent-word-list button {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-light);
+  font-size: 1.4rem;
+}
+
+.recent-word-list button:hover {
+  border-color: var(--border);
+  background: var(--panel);
+  color: var(--code);
+}
+
+.account-panel .request-accordion {
+  margin: 0 0 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--panel-muted);
+}
+
+.account-panel .request-accordion > summary {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  background: var(--panel-muted);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.account-panel .request-accordion > :not(summary) {
+  margin-inline: 1rem;
+}
+
+.account-panel .request-list {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.account-panel .request-card {
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--panel);
+  box-shadow: 0 0.4rem 1rem rgb(49 91 196 / 6%);
+}
+
+.account-quiz-panel > section {
+  margin: 0;
+  padding: 0;
+}
+
+.admin-page .admin-request-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.history-panel #word-history {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .request-heading {
@@ -869,6 +1167,17 @@ main > .quiz-banner {
     --accent-hover: #cedbff;
     --accent-bg: #252b38;
     --border: #465064;
+    --panel: #1d222c;
+    --panel-muted: #252b38;
+    --shadow: 0 1rem 2.5rem rgb(0 0 0 / 20%);
+  }
+
+  .account-stats > div {
+    background: rgb(29 34 44 / 78%);
+  }
+
+  .account-tabs a[aria-current="page"] {
+    color: #172038;
   }
 }
 
@@ -899,6 +1208,46 @@ main > .quiz-banner {
   }
 
   .word-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  main > .account-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .account-hero > a[role="button"] {
+    width: 100%;
+    text-align: center;
+  }
+
+  .account-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .account-tabs {
+    justify-content: flex-start;
+  }
+
+  .account-tabs a {
+    flex: 0 0 auto;
+  }
+
+  .panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .panel-heading > p {
+    text-align: left;
+  }
+
+  .panel-heading form,
+  .panel-heading button,
+  .panel-heading .admin-word-form {
+    width: 100%;
+  }
+
+  .admin-page .admin-request-list {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -980,7 +1329,7 @@ main > .quiz-banner {
   max-width: 100%;
   min-width: 0;
   overflow-wrap: anywhere;
-  background-color: #fff;
+  background-color: var(--panel);
 }
 
 .admin-word-form input,

@@ -61,7 +61,11 @@ export default function WordActions({ slug, name, description, isUser = false, i
         {!kakaoEnabled && <small>카카오톡 공유는 준비 중입니다.</small>}
         {kakaoEnabled && <Script src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.3/kakao.min.js" onReady={() => setKakaoReady(true)} onError={() => setMessage("카카오톡 공유를 불러오지 못했습니다.")} />}
       </div>}
-      {(message || state.message) && <p role="status">{message || state.message}</p>}
+      {(message || state.type === "error") && (
+        <p className={`status-message ${state.type === "error" ? "error" : ""}`} role={state.type === "error" ? "alert" : "status"}>
+          {message || state.message}
+        </p>
+      )}
     </div>
   );
 }
