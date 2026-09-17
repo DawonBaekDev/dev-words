@@ -44,6 +44,29 @@ main h2 {
   letter-spacing: -0.025em;
 }
 
+main > section[aria-labelledby="word-search-heading"] {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--standard-border-radius) * 1.5);
+  background: linear-gradient(135deg, var(--accent-bg), var(--bg) 72%);
+  box-shadow: 0 0.75rem 2rem rgb(49 91 196 / 8%);
+}
+
+#word-search-heading {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  color: var(--accent);
+}
+
+#word-search-heading::before {
+  width: 0.35rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  content: "";
+}
+
 body > header nav {
   max-width: var(--content-width);
   margin-inline: auto;
