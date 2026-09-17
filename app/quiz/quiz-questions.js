@@ -27,6 +27,7 @@ export default function QuizQuestions({ quiz, formAction, isPending, children })
   return (
     <section aria-labelledby="quiz-question-heading">
       <h2 id="quiz-question-heading">AI 퀴즈</h2>
+      <p>카테고리: <strong>{quiz.category}</strong></p>
       <p role="status">문제 {questionIndex + 1} / {quiz.questions.length} · 답변 {answeredCount}개 완료</p>
       <p>답을 선택하면 다음 문제로 이동합니다. 이전·다음 버튼으로 답을 확인하거나 바꿀 수 있습니다.</p>
       <form action={formAction}>

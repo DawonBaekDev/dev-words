@@ -121,12 +121,34 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
     assert.equal(archive.history.length, 2);
     assert.equal(archive.source, "AI요청");
     assert.ok(archive.deletedAt instanceof Date);
+
+    const quizSlugPrefix = `${userId}-quiz-`;
+    const countsBefore = await words.findQuizCategoryCounts();
+    const previousWebCount = countsBefore.find((item) => item._id === "웹 기초")?.count ?? 0;
+    for (let index = 0; index < 5; index++) {
+      await words.createWord({
+        name: `${quizSlugPrefix}${index}`,
+        slug: `${quizSlugPrefix}${index}`,
+        category: "웹 기초",
+      });
+    }
+    const selectedWords = await words.findRandomWords(5, "웹 기초");
+    assert.equal(selectedWords.length, 5);
+    assert.ok(selectedWords.every((word) => word.category === "웹 기초"));
+
+    const latestSlug = `${quizSlugPrefix}latest`;
+    await words.createWord({ name: latestSlug, slug: latestSlug, category: "웹 기초" });
+    const latestCounts = await words.findQuizCategoryCounts();
+    assert.equal(latestCounts.find((item) => item._id === "웹 기초")?.count, previousWebCount + 6);
+    const refreshedWords = await words.findRandomWords(previousWebCount + 6, "웹 기초");
+    assert.ok(refreshedWords.some((word) => word.slug === latestSlug));
   } finally {
     // 이 테스트 실행이 만든 문서만 정리합니다. 기존 데이터에는 접근하지 않습니다.
     for (const name of ["memos", "favorites", "recentWords", "wordRequests", "aiUsage", "aiRuns", "quizSessions"]) {
       await database.collection(name).deleteMany({ userId: { $in: [userId, otherUserId] } });
     }
     await database.collection("words").deleteMany({ slug: `${userId}-delete` });
+    await database.collection("words").deleteMany({ slug: { $regex: `^${userId}-quiz-` } });
     await database.collection("wordHistory").deleteMany({ slug: `${userId}-delete` });
     await (await globalThis.devWordsMongoClientPromise).close();
     globalThis.devWordsMongoClientPromise = undefined;

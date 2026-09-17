@@ -24,7 +24,7 @@ function ActionMessage({ state }) {
   );
 }
 
-export default function QuizClient() {
+export default function QuizClient({ category }) {
   const [quizState, quizFormAction, isQuizPending] = useActionState(
     generateQuiz,
     initialActionState
@@ -38,6 +38,7 @@ export default function QuizClient() {
     return (
       <section aria-labelledby="quiz-result-heading">
         <h2 id="quiz-result-heading">AI 퀴즈 결과</h2>
+        <p>카테고리: <strong>{category}</strong></p>
         <p><strong>{resultState.score}점 / 5점</strong></p>
         <ol className="quiz-question-list">
           {resultState.results.map((result, index) => (
@@ -74,8 +75,10 @@ export default function QuizClient() {
   return (
     <section aria-labelledby="quiz-start-heading">
       <h2 id="quiz-start-heading">AI 퀴즈</h2>
-      <p>난이도를 선택하면 현재 단어장에서 5문제를 만듭니다.</p>
+      <p>선택한 카테고리: <strong>{category}</strong> · <Link href="/quiz">카테고리 변경</Link></p>
+      <p>난이도를 선택하면 현재 등록된 {category === "전체" ? "전체 단어" : `${category} 단어`}에서 5문제를 만듭니다.</p>
       <form action={quizFormAction}>
+        <input type="hidden" name="category" value={category} />
         <fieldset>
           <legend>난이도</legend>
           {QUIZ_DIFFICULTIES.map((difficulty) => (
