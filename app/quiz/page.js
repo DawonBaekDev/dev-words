@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import QuizClient from "./quiz-client";
 import { canUseAiQuiz } from "@/lib/ai/access";
-import { QUIZ_CATEGORIES } from "@/lib/ai/validation";
+import { QUIZ_CATEGORIES, QUIZ_QUESTION_COUNT } from "@/lib/ai/validation";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findQuizCategoryCounts } from "@/lib/words/data";
 
@@ -47,13 +47,13 @@ export default async function QuizPage({ searchParams }) {
                 const count = option === "전체" ? totalWords : countsByCategory.get(option) ?? 0;
                 return (
                   <label key={option} className="quiz-choice">
-                    <input type="radio" name="category" value={option} required disabled={count < 5} />
+                    <input type="radio" name="category" value={option} required disabled={count < QUIZ_QUESTION_COUNT} />
                     {option} · {count}개
                   </label>
                 );
               })}
             </fieldset>
-            <p>한 번에 5문제를 만들기 때문에 단어가 5개 미만인 카테고리는 선택할 수 없습니다.</p>
+            <p>한 번에 {QUIZ_QUESTION_COUNT}문제를 만들기 때문에 단어가 {QUIZ_QUESTION_COUNT}개 미만인 카테고리는 선택할 수 없습니다.</p>
             <button type="submit">난이도 선택</button>
           </form>
         </section>

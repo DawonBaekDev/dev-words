@@ -759,6 +759,11 @@ async function createIndexes(database) {
       name: "expire_quiz_sessions",
     }
   );
+
+  await database.collection("quizSessions").createIndex(
+    { userId: 1, completedAt: -1 },
+    { name: "quiz_notes_by_user_and_completion" }
+  );
 }
 
 // 이메일로 기존 사용자를 확인하고, 없는 사용자만 Better Auth로 생성합니다.

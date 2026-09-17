@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import WordRequestItem from "./word-request-item";
 import EditRequestItem from "./edit-request-item";
+import QuizNotes from "./quiz-notes";
 import { getCurrentSession } from "@/lib/auth/session";
 import { findWordEditRequestsByUser } from "@/lib/word-edit-requests/data";
 import { findWordRequestsByUser } from "@/lib/word-requests/data";
@@ -23,10 +24,11 @@ function formatDateTime(date) {
   }).format(date);
 }
 
-export default async function MyPage() {
+export default async function MyPage({ searchParams }) {
   await connection();
 
   const session = await getCurrentSession();
+  const quizMemoError = (await searchParams)?.quizMemoError;
 
   if (!session?.user) {
     redirect("/");
@@ -65,6 +67,8 @@ export default async function MyPage() {
         <p>{session.user.email}님의 새 단어 요청 처리 상태를 확인하세요.</p>
         <p><Link href="/quiz">AI 퀴즈</Link></p>
       </section>
+
+      <QuizNotes userId={session.user.id} error={quizMemoError} />
 
       <details open className="request-accordion">
         <summary>스크랩한 단어카드 · 목록보기</summary>

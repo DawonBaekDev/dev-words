@@ -101,10 +101,28 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
     assert.equal((await ai.beginAiRun({ userId, type: "quiz" })).reason, "limit");
     assert.deepEqual(await ai.findQuizUsage(userId), { used: 5, remaining: 0 });
     assert.deepEqual(await ai.findQuizUsage(otherUserId), { used: 0, remaining: 5 });
-    const quizId = await ai.createQuizSession({ userId, quiz: { difficulty: "하", questions: [] } });
-    assert.equal(await ai.consumeQuizSession({ quizId, userId: otherUserId }), null);
-    assert.ok(await ai.consumeQuizSession({ quizId, userId }));
-    assert.equal(await ai.consumeQuizSession({ quizId, userId }), null);
+    const quizQuestions = [0, 1, 2].map((index) => ({
+      wordId: `${index}`,
+      question: `문제 ${index + 1}`,
+      choices: ["가", "나", "다", "라"],
+      correctChoiceIndex: index,
+      explanation: `풀이 ${index + 1}`,
+    }));
+    const quizId = await ai.createQuizSession({ userId, category: "데이터", quiz: { difficulty: "하", questions: quizQuestions } });
+    assert.equal(await ai.completeQuizSession({ quizId, userId: otherUserId, answers: [0, 0, 2] }), null);
+    const completedQuiz = await ai.completeQuizSession({ quizId, userId, answers: [0, 0, 2] });
+    assert.equal(completedQuiz.score, 2);
+    assert.equal(completedQuiz.category, "데이터");
+    assert.equal(completedQuiz.results[1].explanation, "풀이 2");
+    assert.equal(completedQuiz.expiresAt, undefined);
+    assert.equal(await ai.completeQuizSession({ quizId, userId, answers: [0, 0, 2] }), null);
+    assert.equal((await ai.findCompletedQuizzesByUser(userId)).length, 1);
+    assert.equal((await ai.findCompletedQuizzesByUser(otherUserId)).length, 0);
+    assert.equal(await ai.saveQuizMemo({ quizId, userId: otherUserId, content: "보이면 안 되는 메모" }), false);
+    assert.equal(await ai.saveQuizMemo({ quizId, userId, content: "복습할 내용" }), true);
+    assert.equal((await ai.findCompletedQuizzesByUser(userId))[0].memo, "복습할 내용");
+    assert.equal(await ai.saveQuizMemo({ quizId, userId, content: "" }), true);
+    assert.equal((await ai.findCompletedQuizzesByUser(userId))[0].memo, "");
 
     const slug = `${userId}-delete`;
     await words.createWord({ name: slug, slug, description: "삭제 검증" }, { id: userId, email: "admin@example.com" }, "AI요청");
@@ -132,8 +150,8 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
         category: "웹 기초",
       });
     }
-    const selectedWords = await words.findRandomWords(5, "웹 기초");
-    assert.equal(selectedWords.length, 5);
+    const selectedWords = await words.findRandomWords(3, "웹 기초");
+    assert.equal(selectedWords.length, 3);
     assert.ok(selectedWords.every((word) => word.category === "웹 기초"));
 
     const latestSlug = `${quizSlugPrefix}latest`;
