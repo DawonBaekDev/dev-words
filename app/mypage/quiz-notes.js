@@ -1,5 +1,6 @@
 import { findCompletedQuizzesByUser } from "@/lib/ai/data";
 import { QUIZ_QUESTION_COUNT } from "@/lib/ai/validation";
+import QuizText from "@/components/quiz-text";
 import { deleteQuizMemoAction, saveQuizMemoAction } from "./quiz-memo-actions";
 
 function formatDateTime(date) {
@@ -27,10 +28,12 @@ export default async function QuizNotes({ userId, error }) {
             <ol className="quiz-question-list">
               {quiz.results.map((result, index) => (
                 <li key={`${quizId}-${index}`}>
-                  <h3>{index + 1}. {result.question}</h3>
-                  <p>{result.isCorrect ? "정답" : "오답"} · 선택한 답: {result.choices[result.selectedChoiceIndex]}</p>
-                  <p>정답: {result.choices[result.correctChoiceIndex]}</p>
-                  <p>해설: {result.explanation}</p>
+                  <h3>{index + 1}번 문제</h3>
+                  <QuizText text={result.question} />
+                  <p>{result.isCorrect ? "정답" : "오답"} · 선택한 답: <QuizText text={result.choices[result.selectedChoiceIndex]} inline /></p>
+                  <p>정답: <QuizText text={result.choices[result.correctChoiceIndex]} inline /></p>
+                  <p>해설</p>
+                  <QuizText text={result.explanation} />
                 </li>
               ))}
             </ol>

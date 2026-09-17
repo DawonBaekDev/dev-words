@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import QuizText from "@/components/quiz-text";
 
 export default function QuizQuestions({ quiz, formAction, isPending, children }) {
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -35,8 +36,9 @@ export default function QuizQuestions({ quiz, formAction, isPending, children })
         {answers.map((answer, index) => (
           <input key={index} type="hidden" name={`answer-${index}`} value={answer} />
         ))}
-        <fieldset disabled={isPending} key={question.wordId}>
-          <legend ref={questionRef} tabIndex={-1}>{questionIndex + 1}. {question.question}</legend>
+        <fieldset disabled={isPending} key={question.wordId} aria-describedby={`quiz-question-${questionIndex}`}>
+          <legend ref={questionRef} tabIndex={-1}>문제 {questionIndex + 1}</legend>
+          <div id={`quiz-question-${questionIndex}`}><QuizText text={question.question} /></div>
           {question.choices.map((choice, choiceIndex) => (
             <label key={choice} className="quiz-choice">
               <input
@@ -46,7 +48,7 @@ export default function QuizQuestions({ quiz, formAction, isPending, children })
                 checked={answers[questionIndex] === String(choiceIndex)}
                 onChange={() => selectAnswer(choiceIndex)}
               />
-              {choice}
+              <QuizText text={choice} inline />
             </label>
           ))}
         </fieldset>
