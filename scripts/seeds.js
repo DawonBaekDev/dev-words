@@ -509,19 +509,19 @@ const seedUsers = [
 // 세 사용자가 서로 다른 카테고리의 단어에 남길 초기 개인 메모를 정의합니다.
 const seedMemos = [
   {
-    userEmail: "learner1@example.com",
+    userEmail: "admin@ts.com",
     wordSlug: "http",
     content:
       "요청은 클라이언트가 보내고 응답은 서버가 보낸다. 브라우저에서 페이지를 여는 상황으로 생각해 보자.",
   },
   {
-    userEmail: "learner2@example.com",
+    userEmail: "user1@ts.com",
     wordSlug: "use-state",
     content:
       "입력창의 값처럼 화면에서 바뀌는 데이터를 관리할 때 사용한다. 상태를 변경하는 함수와 함께 사용한다는 점을 기억하자.",
   },
   {
-    userEmail: "learner3@example.com",
+    userEmail: "user2@ts.com",
     wordSlug: "array",
     content:
       "여러 단어를 하나의 목록으로 담을 수 있다. 첫 번째 항목의 인덱스는 0이고 태그도 배열로 저장한다.",
