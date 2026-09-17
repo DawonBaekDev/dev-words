@@ -112,12 +112,107 @@ body  header nav > a {
 }
 
 .auth-email {
+  max-width: 16rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--standard-border-radius);
+  background: var(--accent-bg);
+  color: var(--text-light);
   font-size: 0.9rem;
+  font-weight: 600;
   overflow-wrap: anywhere;
 }
+
+.auth-controls:has(> .auth-email) {
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--standard-border-radius) + 0.25rem);
+  background: var(--bg);
+  box-shadow: 0 0.35rem 1rem rgb(49 91 196 / 8%);
+}
+
+.auth-controls > a[role="button"],
+.auth-controls > button {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.auth-controls > a[href="/mypage"] {
+  border-color: var(--border);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.auth-controls > a[href="/admin"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+.auth-controls > button:not(#open-auth-dialog) {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--text-light);
+}
+
+.auth-controls > button:not(#open-auth-dialog):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+#open-auth-dialog {
+  box-shadow: 0 0.35rem 1rem rgb(49 91 196 / 12%);
+}
+
+#auth-dialog {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--standard-border-radius) * 1.5);
+  background: var(--bg);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 22%);
+}
+
+#auth-dialog::backdrop {
+  background: rgb(15 23 42 / 45%);
+  backdrop-filter: blur(0.2rem);
+}
+
+#auth-dialog .dialog-heading {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+#auth-dialog form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+#auth-dialog label,
+#auth-dialog input {
+  margin: 0;
+}
+
+#auth-dialog input {
+  width: 100%;
+}
+
+#auth-dialog .form-actions {
+  margin-top: 0.5rem;
+}
+
 .user-name {
-  margin-bottom: 0;
-  color: #0070f3;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1rem auto 0;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 dialog {
@@ -827,6 +922,30 @@ main > .quiz-banner {
   .site-nav,
   .auth-controls {
     flex-wrap: wrap;
+  }
+
+  .auth-controls:has(> .auth-email) {
+    width: 100%;
+  }
+
+  .auth-controls:has(> .auth-email) .auth-email {
+    flex: 1 1 100%;
+    max-width: none;
+    text-align: center;
+  }
+
+  .auth-controls > a[role="button"],
+  .auth-controls > button:not(#open-auth-dialog) {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  #auth-dialog {
+    padding: 1rem;
+  }
+
+  #auth-dialog .form-actions {
+    align-items: stretch;
   }
 }
 
