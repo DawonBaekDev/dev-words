@@ -50,8 +50,8 @@ export default function WordActions({ slug, name, description, isUser = false, i
           <Link className="button" href={`/words/${slug}`}>자세히보기</Link>
         )}
         {isUser && <form action={favoriteAction}>
-          <button type="submit" aria-pressed={isFavorite} disabled={isPending}>
-            {isFavorite ? "★ 스크랩 해제" : "☆ 즐겨찾기"}
+          <button type="submit" aria-pressed={isFavorite} disabled={isPending} className="secondary-cs">
+            {isFavorite ? "★ 스크랩 해제" : "☆ 스크랩"}
           </button>
         </form>}
       </div>

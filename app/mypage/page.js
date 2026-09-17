@@ -66,7 +66,7 @@ export default async function MyPage() {
         <p><Link href="/quiz">AI 퀴즈</Link></p>
       </section>
 
-      <details className="request-accordion">
+      <details open className="request-accordion">
         <summary>스크랩한 단어카드 · 목록보기</summary>
         {favorites.filter((favorite) => wordsById.has(favorite.wordId)).length === 0 && <p>스크랩한 단어카드가 없습니다.</p>}
         <ul className="word-list">
@@ -132,7 +132,7 @@ export default async function MyPage() {
         )}
       </details>
 
-      <details className="request-accordion">
+      <details open className="request-accordion">
         <summary>기존 단어 수정 요청 내역 {editRequests.length}건</summary>
 
         {editRequests.length === 0 ? (

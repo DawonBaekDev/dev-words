@@ -71,7 +71,7 @@ export default async function Home({ searchParams }) {
           <div className="search-actions">
             <button type="submit">검색</button>
             {(filters.query || filters.category) && (
-              <Link href="/" role="button" className="secondary-button">
+              <Link href="/" role="button" className="secondary-button secondary-cs">
                 초기화
               </Link>
             )}
