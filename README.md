@@ -1,34 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 개발자 단어장 — dev-words
 
-## Getting Started
+개발 용어의 의미, 설명, 코드 예시를 찾아보고 개인 메모와 AI 퀴즈로 학습하는 웹 서비스입니다. 로그인 없이 사전을 이용할 수 있으며, 로그인한 일반 사용자는 메모·스크랩·단어 등록 요청 기능을 사용할 수 있습니다.
 
-First, run the development server:
+## 주요 기능
+
+### 공개 사전
+
+- 단어 목록, 검색, 카테고리 필터 및 상세 조회
+- 단어의 직역 의미, 설명, 태그, 코드 예시 제공
+- 상세 페이지 링크 복사 및 카카오톡 공유 기능 제공
+- 카카오톡 공유는 관련 환경 설정이 있어야 활성화
+
+### 로그인한 일반 사용자
+
+- 개인 메모 등록·수정·삭제
+- 메모 삭제 후 초기 입력 화면으로 복귀하며 DB에 이력 보존
+- 단어 스크랩 및 마이페이지에서 최근 스크랩 순 조회
+- 최근 본 단어 최대 10개 표시 및 개별·전체 기록 삭제
+- 새 단어 등록 요청과 기존 단어 수정 요청
+- 마이페이지에서 요청 처리 상태와 등록불가 사유 확인
+- AI 퀴즈 실행 및 완료한 퀴즈의 노트·메모 관리
+
+### 관리자
+
+- 단어 직접 등록·수정·삭제
+- 사용자 요청으로 생성된 AI 초안 검토·수정·승인
+- 승인한 단어를 사전에 등록하고 요청 상태 변경
+- 사유를 필수로 입력하여 등록불가 처리
+- 요청 상태를 `검증 대기중`, `처리완료`, `등록불가`로 표시
+- AI요청·관리자 작성·초기 데이터의 출처별 요약 및 필터
+- 등록 최신순 이력 조회와 수정 전후 내용 확인
+- 삭제된 단어의 이력 보관
+
+Seed로 등록한 단어의 출처는 `초기 설정 데이터`로 표시합니다. 초기 데이터 분류에는 Seed 단어와 출처를 확인할 수 없는 과거 단어가 포함됩니다.
+
+## AI 기능
+
+### 단어 초안 생성
+
+1. 로그인한 사용자가 없는 단어의 등록을 요청합니다.
+2. 서버가 Codex CLI를 실행하여 기존 단어 형식에 맞는 초안을 생성합니다.
+3. 관리자 요청 목록에 초안과 “해당 카드를 등록할까요?” 안내를 표시합니다.
+4. 관리자가 검토·승인하면 공개 사전에 등록합니다.
+5. 등록할 수 없는 요청은 사유와 함께 등록불가 처리합니다.
+
+AI 생성에 실패해도 요청은 보존하며, 관리자가 직접 내용을 작성할 수 있습니다.
+
+### 미니 퀴즈
+
+- 로그인한 일반 사용자 대상
+- 카테고리와 난이도 상·중·하 선택
+- DB에 등록된 단어를 무작위로 추출하여 객관식 문제 생성
+- 단어의 뜻, 사용 상황, 코드 등을 활용한 난이도 조절
+- 현재 회차당 **3문제**, 각 문제는 **4지선다**
+- 제출 후 **3점 만점 점수**, 정답 및 해설 공개
+- 재도전 시 선택 단계로 돌아가며, 종료 시 마이페이지로 이동
+- 사용자별 하루 퀴즈 생성 한도 5회
+
+무작위 추출과 AI 생성을 사용하므로 이전 회차와 문제가 중복될 수 있습니다.
+
+## 기술 구성
+
+| 구분 | 기술 |
+| --- | --- |
+| 웹 프레임워크 | Next.js 16.3.3, React 19 |
+| 인증 | Better Auth |
+| 데이터베이스 | MongoDB |
+| 스타일 | Simple.css |
+| AI 생성 | 서버에서 Codex CLI 실행 |
+| 검증 | Node.js 기본 테스트 러너, ESLint |
+
+페이지는 Server Component를 중심으로 구성하고, 입력과 변경은 Server Action으로 처리합니다. 서버에서 세션·권한·입력값을 검증합니다.
+
+## 로컬 실행
+
+MongoDB와 Node.js/npm 환경을 준비합니다. AI 기능에는 서버에서 실행 가능한 Codex CLI와 인증 설정이 필요합니다.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local`에 다음 값을 설정합니다.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+| 환경 변수 | 용도 |
+| --- | --- |
+| `MONGODB_URI` | MongoDB 연결 주소 |
+| `MONGODB_DB_NAME` | 데이터베이스 이름 |
+| `BETTER_AUTH_SECRET` | 직접 생성한 32자 이상의 인증 비밀키 |
+| `BETTER_AUTH_URL` | 서비스 기본 주소 |
+| `CODEX_CLI_PATH` | 필요할 경우 Codex CLI 실행 경로 지정 |
+| `NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY` | 카카오톡 공유용 JavaScript 키 |
+| `NEXT_PUBLIC_SITE_URL` | 공유 링크에 사용할 사이트 주소 |
 
-## Learn More
+개발용 초기 데이터와 인덱스를 준비한 뒤 실행합니다.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run seed
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+개발 서버: [http://localhost:3000](http://localhost:3000)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Seed 스크립트는 `scripts/seeds.js`에서 관리합니다.
 
-## Deploy on Vercel
+```bash
+# DB 변경 없이 초기 데이터 검사
+npm run seed -- --dry-run
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 인덱스만 준비
+npm run seed -- --indexes-only
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 기존 Seed 단어의 출처 명칭 갱신
+npm run seed -- --sources-only
+```
+
+## 데이터 관리
+
+단어 데이터는 `name`, `meaning`, `description`, `category`, `tags`, `codeExample` 등 역할을 알기 쉬운 필드명을 사용합니다.
+
+| 컬렉션 | 관리 내용 |
+| --- | --- |
+| `words` | 단어와 등록 출처·수정 이력 |
+| `wordHistory` | 삭제된 단어의 내용과 이력 |
+| `memos` | 개인 메모와 변경·삭제 이력 |
+| `favorites` | 사용자별 스크랩 |
+| `recentWords` | 사용자별 최근 열람 기록 |
+| `wordRequests` | 새 단어 요청과 AI 초안 |
+| `wordEditRequests` | 기존 단어 수정 요청 |
+| `quizSessions` | 퀴즈 문제·응답·결과 |
+| `aiUsage`, `aiRuns` | AI 사용량과 실행 상태 |
+
+Better Auth가 관리하는 데이터를 제외하고, 다른 문서를 참조하는 ID는 문자열로 저장합니다.
+
+## 검증 명령
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+## 목표 대비 남은 항목
+
+- 퀴즈를 회차당 5문제·5점 만점으로 변경
+- 스크랩 목록을 기본으로 접고 목록보기를 눌렀을 때 표시
+- 목록 카드에도 공유 버튼을 제공할지 정리
+- 카카오톡 공유 환경 설정과 실제 공유 동작 확인
+- 기존 DB의 Seed 출처가 `초기 설정 데이터`로 갱신됐는지 확인
+
+상세 서비스 명세는 [docs/README.md](docs/README.md)를 참고합니다.
