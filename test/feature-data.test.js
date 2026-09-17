@@ -57,9 +57,18 @@ test("DB 통합: 메모 이력, 즐겨찾기, 최근 열람, AI 제한과 요청
 
     await studyCalendar.saveStudyNote({ userId, dateKey: "2026-09-18", content: "오늘 배운 내용" });
     await studyCalendar.saveStudyNote({ userId, dateKey: "2026-09-18", content: "수정한 내용" });
-    assert.deepEqual((await studyCalendar.findStudyNotesByMonth(userId, "2026-09")).map((note) => note.content), ["수정한 내용"]);
+    await studyCalendar.saveStudyNote({ userId, dateKey: "2026-09-19", content: "다른 날의 내용" });
+    assert.deepEqual(
+      (await studyCalendar.findStudyNotesByMonth(userId, "2026-09")).map((note) => [note.dateKey, note.content]),
+      [["2026-09-18", "수정한 내용"], ["2026-09-19", "다른 날의 내용"]]
+    );
     assert.deepEqual(await studyCalendar.findStudyNotesByMonth(otherUserId, "2026-09"), []);
     await studyCalendar.deleteStudyNote({ userId, dateKey: "2026-09-18" });
+    assert.deepEqual(
+      (await studyCalendar.findStudyNotesByMonth(userId, "2026-09")).map((note) => note.content),
+      ["다른 날의 내용"]
+    );
+    await studyCalendar.deleteStudyNote({ userId, dateKey: "2026-09-19" });
     assert.deepEqual(await studyCalendar.findStudyNotesByMonth(userId, "2026-09"), []);
 
     await memos.savePersonalMemo({ userId, wordId, content: "등록 내용" });

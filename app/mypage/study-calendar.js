@@ -56,6 +56,8 @@ export default async function StudyCalendar({ userId, requestedMonth, requestedD
   const selectedQuizzes = quizzesByDay.get(selectedDay) ?? [];
   const selectedScraps = scrapsByDay.get(selectedDay) ?? [];
   const selectedNote = notesByDay.get(selectedDay);
+  // 날짜나 저장된 노트가 바뀌면 입력창에 해당 날짜의 내용을 다시 표시합니다.
+  const noteFormKey = `${selectedDay}:${selectedNote?.updatedAt?.getTime() ?? "empty"}`;
   const scrapWords = await findWordsByIds(selectedScraps.map((scrap) => scrap.wordId));
   const wordsById = new Map(scrapWords.map((word) => [word._id.toString(), word]));
 
@@ -124,7 +126,7 @@ export default async function StudyCalendar({ userId, requestedMonth, requestedD
         <div className="calendar-day-columns">
           <div className="calendar-note-card">
             <h4>✏️ 오늘의 공부 노트</h4>
-            <form action={saveStudyNoteAction}>
+            <form key={noteFormKey} action={saveStudyNoteAction}>
               <input type="hidden" name="dateKey" value={selectedDay} />
               <label htmlFor="study-note-content">배운 내용이나 느낀 점</label>
               <textarea id="study-note-content" name="content" defaultValue={selectedNote?.content ?? ""} maxLength={1500} rows={7} required placeholder="오늘 기억하고 싶은 개념을 적어보세요." />
