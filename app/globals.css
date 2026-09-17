@@ -750,6 +750,11 @@ dialog {
   overflow: hidden;
 }
 
+.word-history-list > li > details[open] {
+  height: 28rem;
+  overflow-y: auto;
+}
+
 .word-history-list > li > details > summary {
   margin: 0;
   overflow-wrap: anywhere;
@@ -761,6 +766,9 @@ dialog {
 }
 
 .word-history-list > li > details[open] > summary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   margin-bottom: 0;
   border-bottom: 1px solid var(--border);
   background: var(--accent-bg);
