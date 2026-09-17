@@ -19,6 +19,9 @@ body > footer {
 body > header {
   padding-inline: 1rem;
   padding-bottom: 2.5rem;
+  background: linear-gradient(to top, var(--accent-bg), var(--bg) 72%);
+  border-bottom: 0;
+  box-shadow: 0px 5px 10px 0px rgb(102 102 102 / 20%);
 }
 
 body > header h1 {
@@ -57,6 +60,7 @@ main > section[aria-labelledby="word-search-heading"] {
   gap: 0.65rem;
   align-items: center;
   color: var(--accent);
+  margin-top: 0;
 }
 
 #word-search-heading::before {
@@ -78,11 +82,13 @@ body > header nav a {
   font-weight: 700;
 }
 
-body > header nav > a {
+body  header nav > a {
   border: 0;
   padding-left: 0;
   color: var(--text);
   text-decoration: none;
+  margin:0;
+  font-size: 1.5rem;
 }
 
 .site-nav {
@@ -138,7 +144,8 @@ dialog {
 }
 
 .search-form label {
-  margin-bottom: -0.5rem;
+  margin-bottom: -2rem;
+  visibility: hidden;
 }
 
 .search-form label:first-of-type {
@@ -199,8 +206,8 @@ dialog {
 .word-list {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
-  background-color: #fff;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: transparent;
 }
 
 .word-list > li,
@@ -216,24 +223,32 @@ dialog {
 .word-list article {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
   height: 100%;
   margin: 0;
-  padding: 0;
+  overflow: hidden;
+  padding: 1.25rem 1.25rem 0;
   border: 0;
+  border-radius: var(--standard-border-radius);
+  background: var(--accent-bg);
 }
 
 .word-list > li {
   display: flex;
   flex-direction: column;
+  padding: 0.35rem 0.35rem 0;
+  background: var(--bg);
 }
 
 .word-list h3 {
-  margin: 0.35rem 0 0.75rem;
-  font-size: 1.35rem;
+  margin: 0.65rem 0 0.5rem;
+  font-size: 1.45rem;
 }
 
 .word-list h3 a {
-  color: var(--text);
+  color: #0060d1;
+  font-size: 1.7rem;
   text-decoration: none;
 }
 
@@ -247,8 +262,36 @@ dialog {
 }
 
 .word-list .word-actions {
+  align-self: stretch;
   margin-top: auto;
-  padding-top: 1.25rem;
+  margin-inline: -1.25rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.word-list .word-actions .form-actions {
+  width: 100%;
+}
+
+.word-list .word-actions .button {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 1rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #777;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.word-list .word-actions .button::after {
+  display: grid;
+  content: "→";
 }
 
 .word-actions button {
@@ -284,18 +327,30 @@ dialog {
   padding: .2rem .7em;
 }
 
+.word-list .word-category {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--accent);
+}
+
 .tag-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin: 1rem 0 0;
+  margin: 0rem 0 1rem;
 }
 
 .tag-list li {
-  padding: 0.2rem 0.55rem;
+  padding: 0.1rem .55rem .2rem;
   border-radius: 999px;
   background: var(--accent-bg);
   font-size: 0.85rem;
+}
+
+.word-list .tag-list li {
+  border: 1px solid #ffb224;
+  background: var(--bg);
+  color:#ff990a;
 }
 
 .word-detail > header {
@@ -567,6 +622,10 @@ main > .quiz-banner {
 }
 
 @media (max-width: 48rem) {
+  .word-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .search-form {
     grid-template-columns: minmax(0, 1fr);
   }

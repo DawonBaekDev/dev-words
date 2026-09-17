@@ -37,7 +37,7 @@ export default async function RootLayout({ children }) {
         </header>
         {children}
         <footer>
-          <p>개발자 단어장 · 학습용 웹 서비스</p>
+          <p>개발자 단어장 · 학습용 웹 서비스 / 조원: 임지연, 백다원</p>
         </footer>
       </body>
     </html>
