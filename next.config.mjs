@@ -8,6 +8,7 @@ const nextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  allowedDevOrigins: ['dev-words.p-e.kr']
 };
 
 export default nextConfig;
