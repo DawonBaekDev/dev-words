@@ -36,9 +36,27 @@ body > footer {
 }
 
 body > header {
-  padding: 0 1rem;
-  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  padding-inline: 1rem;
+  padding-bottom: 1rem;
+  background: var(--panel-muted);
   border-bottom: 1px solid var(--border);
+}
+
+body > header h1 {
+  margin: 0.5rem auto;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  line-height: 1.35;
+  letter-spacing: -0.04em;
+  word-break: keep-all;
+  color: var(--accent);
+}
+
+body > header p {
+  margin: 0.5rem auto 0;
+  color: var(--text-light);
+  word-break: keep-all;
 }
 
 body > main {
@@ -57,24 +75,21 @@ main h2 {
 }
 
 main > section[aria-labelledby="word-search-heading"] {
-  padding: 1rem 0 0;
-  border: 0;
-  background: transparent;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--panel);
 }
 
 #word-search-heading {
-  margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2rem);
-  color: var(--text);
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
 }
 
-.search-intro {
-  margin: 0.5rem 0 1rem;
-  color: var(--text-light);
-}
-
-body > header > nav.site-nav {
-  margin-block: 0;
+body > header nav {
   max-width: var(--content-width);
   margin-inline: auto;
   padding-block: 0.75rem;
@@ -117,8 +132,9 @@ body  header nav > a {
 
 .auth-email {
   max-width: 16rem;
-  padding: 0;
-  background: transparent;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0;
+  background: var(--accent-bg);
   color: var(--text-light);
   font-size: 0.9rem;
   font-weight: 600;
@@ -126,9 +142,10 @@ body  header nav > a {
 }
 
 .auth-controls:has(> .auth-email) {
-  padding: 0;
-  border: 0;
-  background: transparent;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg);
 }
 
 .auth-controls > a[role="button"],
@@ -231,6 +248,18 @@ textarea:focus-visible {
   text-align: center;
 }
 
+.user-name {
+  width: fit-content;
+  max-width: 100%;
+  margin: 1rem auto 0;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
 
 dialog {
   width: min(28rem, calc(100% - 2rem));
@@ -324,70 +353,105 @@ dialog {
 }
 
 .word-list {
-  margin: 0.75rem 0;
-  border-top: 1px solid var(--text);
-}
-
-.word-list > li {
-  min-width: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.word-list article {
+  margin-block: 0.75rem 0;
   display: grid;
-  grid-template-columns: minmax(9rem, 1fr) minmax(0, 3fr) auto;
-  gap: 1.5rem;
-  align-items: center;
-  margin: 0;
-  padding: 1.25rem 0;
-  border: 0;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   background: transparent;
-  overflow-wrap: anywhere;
 }
 
-.word-list h3 {
-  margin: 0.25rem 0 0;
-  font-size: 1.2rem;
-}
-
-.word-list h3 a {
-  color: var(--text);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-}
-
-.word-list p {
-  margin: 0;
-}
-
-.word-list .word-actions {
-  margin: 0;
-}
-
-.word-list .word-actions .form-actions {
-  align-items: flex-start;
-  flex-direction: column;
-}
-
-.word-list .word-actions .button {
-  margin: 0;
-  padding: 0.25rem 0;
-  border: 0;
-  background: transparent;
-  color: var(--accent);
-  font-size: 0.95rem;
-}
-
+.word-list > li,
 .empty-result,
 .word-detail {
   min-width: 0;
   overflow-wrap: anywhere;
   padding: 1.25rem;
   border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.word-list article {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  padding: 1rem 1rem 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--panel);
+}
+
+.word-list > li {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.word-list > li:hover {
+  border-color: var(--accent);
+}
+
+.word-list h3 {
+  margin: 0.65rem 0 0.5rem;
+  font-size: 1.45rem;
+}
+
+.word-list h3 a {
+  color: var(--accent);
+  font-size: 1.4rem;
+  text-decoration: none;
+}
+
+.word-list h3 a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.word-list p {
+  margin-block: 0.5rem;
+}
+
+.word-list .word-actions {
+  align-self: stretch;
+  min-height: 3rem;
+  margin-top: auto;
+  margin-inline: -1rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.word-list .word-actions .form-actions {
+  width: 100%;
+}
+
+.word-list .word-actions .button {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 1rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-light);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.word-list .word-actions .button::after {
+  display: grid;
+  content: "→";
 }
 
 .word-actions button {
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   margin: 0;
 }
 .word-actions button[aria-pressed="true"] {
@@ -424,12 +488,9 @@ dialog {
 }
 
 .word-list .word-category {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--text-light);
-  font-size: 0.8rem;
-  font-weight: 400;
+  border: 1px solid var(--accent);
+  background: var(--panel);
+  color: var(--accent);
 }
 
 .tag-list {
@@ -1217,8 +1278,6 @@ main > .account-panel {
   background: var(--panel-muted);
 }
 
-
-
 .calendar-activity-list strong,
 .calendar-activity-list small,
 .calendar-activity-list a {
@@ -1267,7 +1326,7 @@ main > .account-panel {
   padding: 1.25rem;
   border: 1px solid var(--border);
   border-radius: 0;
-  background: var(--panel);
+  background: var(--pink-bg);
 }
 
 .personal-memo-card > header {
@@ -1432,15 +1491,14 @@ main > .quiz-banner {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.75rem 0;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
   border-radius: 0;
 }
 
 .quiz-banner h2 {
-  font-size: 1rem;
+  font-size: 1.4rem;
   margin-bottom: 0.5rem;
 }
 
@@ -1696,14 +1754,8 @@ main.quiz-page > .quiz-shell {
     margin: 0.75rem;
   }
 
-  .word-list article {
+  .word-list {
     grid-template-columns: minmax(0, 1fr);
-    gap: 0.65rem;
-  }
-
-  .word-list .word-actions .form-actions {
-    flex-direction: row;
-    align-items: center;
   }
 
   .personal-memo-list {
@@ -1780,22 +1832,16 @@ main.quiz-page > .quiz-shell {
   }
 
   .search-form {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .search-form input {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-
-  .search-form select {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
+  .search-form label:first-of-type,
+  .search-form label:last-of-type,
+  .search-form input,
+  .search-form select,
   .search-actions {
-    grid-column: 2;
-    grid-row: 2;
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .search-actions {
@@ -1897,13 +1943,18 @@ main.quiz-page > .quiz-shell {
   width: 100%;
 }
 
-.quiz-banner-intro h2 {
-  margin: 0 0 0.25rem;
+.quiz-banner-intro {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.quiz-banner p {
-  font-size: 0.9rem;
-  color: var(--text-light);
+.quiz-banner-intro > div {
+  min-width: 0;
+}
+
+.quiz-banner-intro h2 {
+  margin-top: 0;
 }
 
 pre {
