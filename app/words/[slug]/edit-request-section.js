@@ -1,5 +1,7 @@
 "use client";
 
+import StickerIcon from "@/components/sticker-icon";
+
 import { useActionState, useRef, useState } from "react";
 import { saveWordEditRequest } from "./edit-request-actions";
 
@@ -33,7 +35,7 @@ export default function EditRequestSection({ slug, request }) {
       <h3 id="edit-request-heading">수정 요청</h3>
       {!isEditing && (
         <button type="button" onClick={() => setIsEditing(true)}>
-          {request ? "수정 요청 내용 수정" : "수정 요청하기"}
+          <StickerIcon name="pencil" /> {request ? "수정 요청 내용 수정" : "수정 요청하기"}
         </button>
       )}
 

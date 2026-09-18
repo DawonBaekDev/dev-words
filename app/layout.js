@@ -1,3 +1,4 @@
+import StickerIcon from "@/components/sticker-icon";
 import Link from "next/link";
 import "simpledotcss/simple.css";
 import "./globals.css";
@@ -26,7 +27,7 @@ export default async function RootLayout({ children }) {
       <body>
         <header>
           <nav aria-label="주요 메뉴" className="site-nav">
-            <Link href="/">📝 개<small>(발자,어)</small>린이의 단어장</Link>
+            <Link href="/"><StickerIcon name="dictionary" size={44} /> 개<small>(발자,어)</small>린이의 단어장</Link>
             <AuthControls user={user} />
           </nav>
           {user && (

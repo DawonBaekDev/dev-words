@@ -1,3 +1,4 @@
+import StickerIcon from "@/components/sticker-icon";
 import Link from "next/link";
 import { connection } from "next/server";
 import QuizEntry from "./quiz-entry";
@@ -30,15 +31,18 @@ export default async function Home({ searchParams }) {
     <main>
       {session?.user?.role !== "admin" && (
         <section className="quiz-banner" aria-labelledby="home-quiz-heading">
-          <div>
-            <h2 id="home-quiz-heading">배운 단어, 퀴즈로 확인해 볼까요?</h2>
-            <p>AI가 만드는 랜덤 {QUIZ_QUESTION_COUNT}문제 · 하루 5회 도전</p>
-            {quizUsage && (
-              <p>
-                <strong>오늘 {quizUsage.used}회 도전 · {quizUsage.remaining}회 더 도전 가능</strong>
-                {quizUsage.remaining === 0 && <span> · 내일 다시 도전해 주세요.</span>}
-              </p>
-            )}
+          <div className="quiz-banner-intro">
+            <StickerIcon name="student" size={64} />
+            <div>
+              <h2 id="home-quiz-heading">배운 단어, 퀴즈로 확인해 볼까요?</h2>
+              <p>AI가 만드는 랜덤 {QUIZ_QUESTION_COUNT}문제 · 하루 5회 도전</p>
+              {quizUsage && (
+                <p>
+                  <strong>오늘 {quizUsage.used}회 도전 · {quizUsage.remaining}회 더 도전 가능</strong>
+                  {quizUsage.remaining === 0 && <span> · 내일 다시 도전해 주세요.</span>}
+                </p>
+              )}
+            </div>
           </div>
           <QuizEntry isLoggedIn={session?.user?.role === "user"} />
         </section>

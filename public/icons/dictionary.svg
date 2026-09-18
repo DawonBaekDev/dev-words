@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">
+  <title>사전 아이콘</title>
+  <path d="M512 806C415 756 291 748 130 782V297C287 263 413 273 512 325C611 273 737 263 894 297V782C733 748 609 756 512 806Z" fill="#6654E8"/>
+  <path d="M512 754C418 710 306 698 175 720V245C303 221 418 237 512 289V754Z" fill="#F5F2FF" stroke="#2D2D48" stroke-width="22" stroke-linejoin="round"/>
+  <path d="M512 754C606 710 718 698 849 720V245C721 221 606 237 512 289V754Z" fill="#FFFFFF" stroke="#2D2D48" stroke-width="22" stroke-linejoin="round"/>
+  <path d="M512 289V754" stroke="#6654E8" stroke-width="18" stroke-linecap="round"/>
+  <path d="M245 354H420M245 417H420M245 480H389M245 543H419" stroke="#6654E8" stroke-width="18" stroke-linecap="round"/>
+  <path d="M622 355H770M622 417H718" stroke="#C6BEF9" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="687" cy="555" r="80" fill="#FCEAF3" stroke="#6654E8" stroke-width="22"/>
+  <path d="M747 615L813 681" stroke="#6654E8" stroke-width="28" stroke-linecap="round"/>
+  <path d="M771 259V346L741 326L711 346V248" fill="#E8589C" stroke="#2D2D48" stroke-width="16" stroke-linejoin="round"/>
+</svg>

@@ -1,3 +1,4 @@
+import StickerIcon from "@/components/sticker-icon";
 import Link from "next/link";
 
 function formatDateTime(date) {
@@ -14,7 +15,7 @@ export default function PersonalMemos({ memos, wordsById }) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">MY MEMOS</p>
-          <h2 id="personal-memos-heading">개인 메모</h2>
+          <h2 id="personal-memos-heading"><StickerIcon name="pencil" /> 개인 메모</h2>
         </div>
         <p>단어카드에서 작성한 메모를 최근 수정한 순서로 모았습니다.</p>
       </div>

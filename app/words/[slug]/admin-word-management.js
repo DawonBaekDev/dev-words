@@ -1,5 +1,7 @@
 "use client";
 
+import StickerIcon from "@/components/sticker-icon";
+
 import { useActionState, useRef, useState } from "react";
 import { deleteAdminWord, updateAdminWord } from "./admin-actions";
 import { CODE_LANGUAGE_LABELS, WORD_CATEGORIES } from "@/lib/words/search";
@@ -33,7 +35,7 @@ export default function AdminWordManagement({ word, editRequestId, initiallyEdit
       {!isEditing && (
         <div className="form-actions">
           <button type="button" onClick={() => setIsEditing(true)}>
-            수정
+            <StickerIcon name="pencil" /> 수정
           </button>
           <button
             type="button"
