@@ -1,6 +1,5 @@
 "use client";
 
-import StickerIcon from "@/components/sticker-icon";
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
@@ -47,13 +46,13 @@ export default function WordActions({ slug, name, description, isUser = false, i
     <div className="word-actions">
       <div className="form-actions">
         {showShare ? (
-          <button type="button" aria-expanded={isSharing} onClick={() => setIsSharing(!isSharing)}><StickerIcon name="paperclip" /> 공유</button>
+          <button type="button" aria-expanded={isSharing} onClick={() => setIsSharing(!isSharing)}>공유</button>
         ) : (
           <Link className="button" href={`/words/${slug}`}>자세히보기</Link>
         )}
         {isUser && <form action={favoriteAction}>
           <button type="submit" aria-pressed={isFavorite} disabled={isPending} className="secondary-cs">
-            {isFavorite ? "★ 스크랩 해제" : "☆ 스크랩"}
+            {isFavorite ? "스크랩 해제" : "스크랩"}
           </button>
         </form>}
       </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import StickerIcon from "@/components/sticker-icon";
 
 export default function GuestMemoButton() {
   function openLoginDialog() {
@@ -9,7 +8,7 @@ export default function GuestMemoButton() {
 
   return (
     <button type="button" onClick={openLoginDialog}>
-      <StickerIcon name="pencil" /> 메모하기
+      메모하기
     </button>
   );
 }

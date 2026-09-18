@@ -1,4 +1,3 @@
-import StickerIcon from "@/components/sticker-icon";
 import Link from "next/link";
 import { connection } from "next/server";
 import QuizEntry from "./quiz-entry";
@@ -29,26 +28,9 @@ export default async function Home({ searchParams }) {
 
   return (
     <main>
-      {session?.user?.role !== "admin" && (
-        <section className="quiz-banner" aria-labelledby="home-quiz-heading">
-          <div className="quiz-banner-intro">
-            <StickerIcon name="student" size={64} />
-            <div>
-              <h2 id="home-quiz-heading">배운 단어, 퀴즈로 확인해 볼까요?</h2>
-              <p>AI가 만드는 랜덤 {QUIZ_QUESTION_COUNT}문제 · 하루 5회 도전</p>
-              {quizUsage && (
-                <p>
-                  <strong>오늘 {quizUsage.used}회 도전 · {quizUsage.remaining}회 더 도전 가능</strong>
-                  {quizUsage.remaining === 0 && <span> · 내일 다시 도전해 주세요.</span>}
-                </p>
-              )}
-            </div>
-          </div>
-          <QuizEntry isLoggedIn={session?.user?.role === "user"} />
-        </section>
-      )}
       <section aria-labelledby="word-search-heading">
-        <h2 id="word-search-heading">단어 검색</h2>
+        <h1 id="word-search-heading">개발 용어 사전</h1>
+        <p className="search-intro">궁금한 용어를 검색하고, 설명과 코드 예시를 함께 살펴보세요.</p>
         <form action="/" method="get" className="search-form">
           <label htmlFor="query">검색어</label>
           <input
@@ -84,6 +66,22 @@ export default async function Home({ searchParams }) {
         </form>
       </section>
 
+      {session?.user?.role !== "admin" && (
+        <section className="quiz-banner" aria-labelledby="home-quiz-heading">
+          <div className="quiz-banner-intro">
+            <h2 id="home-quiz-heading">단어 복습</h2>
+            <p>AI가 만드는 랜덤 {QUIZ_QUESTION_COUNT}문제 · 하루 5회 도전</p>
+            {quizUsage && (
+              <p>
+                <strong>오늘 {quizUsage.used}회 도전 · {quizUsage.remaining}회 더 도전 가능</strong>
+                {quizUsage.remaining === 0 && <span> · 내일 다시 도전해 주세요.</span>}
+              </p>
+            )}
+          </div>
+          <QuizEntry isLoggedIn={session?.user?.role === "user"} />
+        </section>
+      )}
+
       <section aria-labelledby="word-list-heading">
         <div className="section-heading">
           <h2 id="word-list-heading">단어 목록</h2>
@@ -114,18 +112,13 @@ export default async function Home({ searchParams }) {
             {words.map((word) => (
               <li key={word._id.toString()}>
                 <article>
-                  <p className="word-category">{word.category}</p>
-                  <h3>
-                    <Link href={`/words/${word.slug}`}>{word.name}</Link>
-                  </h3>
+                  <div className="word-list-title">
+                    <p className="word-category">{word.category}</p>
+                    <h3>
+                      <Link href={`/words/${word.slug}`}>{word.name}</Link>
+                    </h3>
+                  </div>
                   <p>{word.description}</p>
-                  {word.tags.length > 0 && (
-                    <ul className="tag-list" aria-label={`${word.name} 태그`}>
-                      {word.tags.map((tag) => (
-                        <li key={tag}>{tag}</li>
-                      ))}
-                    </ul>
-                  )}
                   <WordActions slug={word.slug} name={word.name} description={word.description} isUser={session?.user?.role === "user"} isFavorite={favoriteIds.has(word._id.toString())} />
                 </article>
               </li>

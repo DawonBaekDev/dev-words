@@ -125,7 +125,7 @@ export default async function StudyCalendar({ userId, requestedMonth, requestedD
 
         <div className="calendar-day-columns">
           <div className="calendar-note-card">
-            <h4>✏️ 오늘의 공부 노트</h4>
+            <h4>오늘의 공부 노트</h4>
             <form key={noteFormKey} action={saveStudyNoteAction}>
               <input type="hidden" name="dateKey" value={selectedDay} />
               <label htmlFor="study-note-content">배운 내용이나 느낀 점</label>
@@ -139,13 +139,12 @@ export default async function StudyCalendar({ userId, requestedMonth, requestedD
           </div>
 
           <div className="calendar-activity-card">
-            <h4>📚 이날의 학습 기록</h4>
+            <h4>이날의 학습 기록</h4>
             {selectedQuizzes.length === 0 && selectedScraps.length === 0 ? (
               <p>이날의 퀴즈나 스크랩 기록이 없습니다.</p>
             ) : (
               <ul className="calendar-activity-list">
                 {selectedQuizzes.map((quiz) => <li key={quiz._id.toString()}>
-                  <span className="activity-icon quiz" aria-hidden="true">?</span>
                   <div>
                     <strong>{quiz.category ?? "전체"} 퀴즈 · {quiz.score}점 / {QUIZ_QUESTION_COUNT}점</strong>
                     <small>{formatTime(quiz.completedAt)} · 난이도 {quiz.difficulty}</small>
@@ -155,7 +154,6 @@ export default async function StudyCalendar({ userId, requestedMonth, requestedD
                 {selectedScraps.map((scrap) => {
                   const word = wordsById.get(scrap.wordId);
                   return <li key={`${selectedDay}-${scrap.wordId}`}>
-                    <span className="activity-icon scrap" aria-hidden="true">★</span>
                     <div>
                       <strong>{word?.name ?? "삭제된 단어"} 스크랩</strong>
                       <small>{formatTime(scrap.createdAt)}</small>

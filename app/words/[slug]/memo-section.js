@@ -1,6 +1,5 @@
 "use client";
 
-import StickerIcon from "@/components/sticker-icon";
 
 import { useActionState, useState } from "react";
 import { saveMemo, deleteMemo } from "./actions";
@@ -103,7 +102,7 @@ export default function MemoSection({ slug, memo }) {
             </div>
           </dl>
           <button type="button" onClick={startEditing}>
-            <StickerIcon name="pencil" /> 수정
+            수정
           </button>
           <form action={deleteAction} onSubmit={(event) => {
             if (!window.confirm("메모를 삭제하시겠습니까? 삭제 이력은 보관됩니다.")) event.preventDefault();
@@ -116,7 +115,7 @@ export default function MemoSection({ slug, memo }) {
 
       {!isEditing && !memo && (
         <button type="button" onClick={startEditing}>
-          <StickerIcon name="pencil" /> 메모하기
+          메모하기
         </button>
       )}
 
