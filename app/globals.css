@@ -1961,3 +1961,17 @@ pre {
   background: var(--panel-muted);
   color: var(--text);
 }
+
+.site-nav .site-logo {
+  display: block;
+  width: min(20rem, 80vw);
+  max-width: 100%;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.site-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}

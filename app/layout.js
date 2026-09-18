@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import "simpledotcss/simple.css";
 import "./globals.css";
 import AuthControls from "@/components/auth-controls";
@@ -26,7 +27,16 @@ export default async function RootLayout({ children }) {
       <body>
         <header>
           <nav aria-label="주요 메뉴" className="site-nav">
-            <Link href="/">개린이의 단어장</Link>
+            <Link href="/" className="site-logo">
+              <Image
+                src="/brand/rookie-dictionary-logo.png"
+                alt="개(발, 어)린이의 단어장"
+                width={2161}
+                height={728}
+                sizes="(max-width: 400px) 80vw, 320px"
+                loading="eager"
+              />
+            </Link>
             <AuthControls user={user} />
           </nav>
           {user && (
